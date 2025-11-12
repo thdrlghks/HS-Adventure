@@ -5,7 +5,7 @@ public class P_Attack : MonoBehaviour
 {
     [Header("공격 설정")]
     public float attackTurnSpeed = 10f;   // 회전 속도
-    public float attackDuration = 2f;     // 공격 애니메이션 길이
+    public float attackDuration = 1f;     // 공격 애니메이션 길이
     public string attackTrigger = "Attack1";
 
     private Animator animator;
