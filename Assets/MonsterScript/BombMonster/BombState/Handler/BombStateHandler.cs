@@ -1,0 +1,136 @@
+using UnityEngine;
+
+public class BombStateHandler : MonoBehaviour
+{
+    private BombMan _bomb;
+    private Transform _player;
+    private Collider _bombCollider, _detectCollider;
+    private Collider[] childColliders;
+
+    private float detectRadius = 5f;
+    private float frontAngle = 60f, backAngle = 160f;          
+    private float detectlimit = 3f; 
+
+    private float detectTimer = 0f;
+    private bool _readyExplode, _walking;
+
+    public void Initialize(BombMan bomb)
+    {
+        _bomb = bomb;
+    }
+    private void Awake()
+    {
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p == null)
+        {
+            Debug.Log("플레이어를 찾을 수 없습니다.");
+            return;
+        }
+            
+        _player = p.transform;
+
+        childColliders = GetComponentsInChildren<Collider>();
+
+        foreach ( var col in childColliders )
+        {
+            if(col.name == "explodeCollider")
+            {
+                _bombCollider = col;
+            } 
+            else if (col.name == "detectCollider")
+            {
+                _detectCollider = col;
+            }
+        }
+    }
+
+    private void Update()
+    {
+        CheckArea();
+    }
+
+    private void CheckArea()
+    {
+        Collider[] detect = Physics.OverlapSphere(transform.position, detectRadius, playerMask);
+
+        if (detect.Length == 0)
+        {
+            if(_walking == true)
+            {
+                _bomb.ChangeMoveState(BombManAction.idle);
+            }
+            _walking = false;
+            detectTimer = 0f;
+            return;
+            
+        }
+
+        float distance = Vector3.Distance(transform.position, _player.position);
+        if (distance <= 1.5f)
+        {
+            _readyExplode = true;
+            _bomb.ChangeMoveState(BombManAction.explode);
+        }
+        
+        Vector3 dir = (_player.position - transform.position).normalized;
+        float sight = Vector3.Angle(transform.forward, dir);
+
+        if (sight < frontAngle  && !_readyExplode)
+        {
+            _bomb.ChangeMoveState(BombManAction.walk);
+            _walking = true;
+        }
+
+        if (sight >= frontAngle && sight <= backAngle && !_readyExplode)
+        {
+            detectTimer += Time.deltaTime;
+            
+            if(detectTimer >= detectlimit)
+            {
+                _bomb.ChangeMoveState(BombManAction.walk);
+                _walking = true;
+            }
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1f, 1f, 1f, 0.1f); 
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
+
+        Gizmos.color = new Color(0f, 1f, 0f, 0.2f); 
+        DrawSector(transform.position, transform.forward, detectRadius, frontAngle);
+
+        Gizmos.color = new Color(1f, 0f, 0f, 0.2f); 
+        DrawSector(transform.position, -transform.forward, detectRadius, 180f - backAngle);
+    }
+
+    private void DrawSector(Vector3 center, Vector3 direction, float radius, float angle)
+    {
+        int segments = 30;
+
+        float halfAngle = angle;
+        Quaternion leftRot = Quaternion.AngleAxis(-halfAngle, Vector3.up);
+        Quaternion rightRot = Quaternion.AngleAxis(halfAngle, Vector3.up);
+
+        Vector3 leftDir = leftRot * direction;
+        Vector3 rightDir = rightRot * direction;
+
+        Vector3 prevPoint = center + leftDir * radius;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float t = (float)i / segments;
+            Quaternion rot = Quaternion.Slerp(leftRot, rightRot, t);
+            Vector3 nextDir = rot * direction;
+            Vector3 nextPoint = center + nextDir * radius;
+
+            Gizmos.DrawLine(prevPoint, nextPoint);
+            prevPoint = nextPoint;
+        }
+
+        Gizmos.DrawLine(center, center + leftDir * radius);
+        Gizmos.DrawLine(center, center + rightDir * radius);
+    }
+
+}
