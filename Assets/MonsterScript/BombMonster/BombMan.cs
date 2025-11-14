@@ -15,14 +15,14 @@ public class BombMan : CharacterBase
 
     public StateMachine<BombMan> _actionMachine;
 
+
     private Rigidbody _rigidbody;
 
     private BombStateHandler _bombStateHandler;
-
-    public Transform HandlerTransform => _handlerTransform;
     
     public Animator Animator => _animator;
     public Rigidbody Rigidbody => _rigidbody;
+    public Transform HandlerTransform => _handlerTransform;
     public BombStateHandler BombStateHandler => _bombStateHandler;
 
     protected override void Awake()
@@ -60,12 +60,9 @@ public class BombMan : CharacterBase
     {
         if (_actionMachine != null)
             _actionMachine.FixedExecute();
-
-        if (_actionMachine != null)
-            _actionMachine.FixedExecute();
     }
 
-    public void ChangeMoveState(BombManAction state)
+    public void ChangeActionState(BombManAction state)
     {
         _actionMachine.ChangeState(_action[(int)state]);
     }

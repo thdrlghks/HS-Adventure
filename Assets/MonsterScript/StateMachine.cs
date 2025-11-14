@@ -25,7 +25,7 @@ public class StateMachine<T> where T : class
 
     public void ChangeState(State<T> newState)
     {
-        if (newState != null) return;
+        if (newState == null) return;
         if (curState != null)
             curState.Exit(ownerObject);
 

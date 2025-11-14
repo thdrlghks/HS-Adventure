@@ -4,7 +4,7 @@ public class BombExplode : State<BombMan>
 {
     public override void Enter(BombMan bombman)
     {
-
+        Debug.Log("혹시 너냐?");
     }
 
     public override void Execute(BombMan bombman)

@@ -341,7 +341,7 @@ GameObject:
   - component: {fileID: 325272622}
   - component: {fileID: 325272621}
   - component: {fileID: 325272620}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: skeleton
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1939,7 +1939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BombStateHandler
   playerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
 --- !u!1 &1705290073
 GameObject:
   m_ObjectHideFlags: 0

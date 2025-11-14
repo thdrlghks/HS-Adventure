@@ -8,11 +8,12 @@ public class BombStateHandler : MonoBehaviour
     private Collider[] childColliders;
 
     private float detectRadius = 5f;
-    private float frontAngle = 60f, backAngle = 160f;          
-    private float detectlimit = 3f; 
+    private float frontAngle = 60f, backAngle = 150f;          
+    private float detectlimit = 3f;
+    public LayerMask playerMask;
 
     private float detectTimer = 0f;
-    private bool _readyExplode, _walking;
+    private bool _readyExplode, _walking, _damaged;
 
     public void Initialize(BombMan bomb)
     {
@@ -57,7 +58,8 @@ public class BombStateHandler : MonoBehaviour
         {
             if(_walking == true)
             {
-                _bomb.ChangeMoveState(BombManAction.idle);
+                _bomb.ChangeActionState(BombManAction.idle);
+                Debug.Log("æ— ≥ı√∆¥Ÿ.");
             }
             _walking = false;
             detectTimer = 0f;
@@ -66,18 +68,18 @@ public class BombStateHandler : MonoBehaviour
         }
 
         float distance = Vector3.Distance(transform.position, _player.position);
-        if (distance <= 1.5f)
+        if (distance <= 1.5f && _readyExplode == false && _walking == true || _damaged)
         {
             _readyExplode = true;
-            _bomb.ChangeMoveState(BombManAction.explode);
-        }
-        
+            _bomb.ChangeActionState(BombManAction.explode);
+        } 
+
         Vector3 dir = (_player.position - transform.position).normalized;
         float sight = Vector3.Angle(transform.forward, dir);
 
-        if (sight < frontAngle  && !_readyExplode)
+        if (sight < frontAngle && !_readyExplode && _walking == false)
         {
-            _bomb.ChangeMoveState(BombManAction.walk);
+            _bomb.ChangeActionState(BombManAction.walk);
             _walking = true;
         }
 
@@ -85,9 +87,9 @@ public class BombStateHandler : MonoBehaviour
         {
             detectTimer += Time.deltaTime;
             
-            if(detectTimer >= detectlimit)
+            if(detectTimer >= detectlimit && _walking == false)
             {
-                _bomb.ChangeMoveState(BombManAction.walk);
+                _bomb.ChangeActionState(BombManAction.walk);
                 _walking = true;
             }
         }

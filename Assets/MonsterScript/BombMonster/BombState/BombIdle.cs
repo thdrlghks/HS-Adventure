@@ -9,7 +9,7 @@ public class BombIdle : State<BombMan>
 
     public override void Enter(BombMan bombman)
     {
-
+        Debug.Log("아 모르겠다.");
     }
 
     public override void Execute(BombMan bombman)

@@ -4,7 +4,7 @@ public class BombWalk : State<BombMan>
 {
     public override void Enter(BombMan bombman)
     {
-
+        Debug.Log("플레이어 발견!!");
     }
 
     public override void Execute(BombMan bombman)
