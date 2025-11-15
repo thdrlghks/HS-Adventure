@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum BombManAction
 {
@@ -9,6 +10,8 @@ public class BombMan : CharacterBase
 {
     [SerializeField] private BombManData _data;
     [SerializeField] private Animator _animator;
+    [SerializeField] private NavMeshAgent _agent;
+    [SerializeField] private Area wanderArea;
     [SerializeField] private Transform _handlerTransform;
 
     public State<BombMan>[] _action;
@@ -22,12 +25,15 @@ public class BombMan : CharacterBase
     
     public Animator Animator => _animator;
     public Rigidbody Rigidbody => _rigidbody;
+    public NavMeshAgent NavMeshAgent => _agent;
+    public Area WanderArea => wanderArea;
     public Transform HandlerTransform => _handlerTransform;
     public BombStateHandler BombStateHandler => _bombStateHandler;
 
     protected override void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _agent = GetComponent<NavMeshAgent>();
 
        _bombStateHandler = _handlerTransform.GetComponent<BombStateHandler>();
     }

@@ -15,6 +15,8 @@ public class BombStateHandler : MonoBehaviour
     private float detectTimer = 0f;
     private bool _readyExplode, _walking, _damaged;
 
+
+    public Transform Player => _player;
     public void Initialize(BombMan bomb)
     {
         _bomb = bomb;
@@ -52,6 +54,19 @@ public class BombStateHandler : MonoBehaviour
 
     private void CheckArea()
     {
+        if (!_bomb.WanderArea.IsInsideArea(_player.position))
+        {
+            if (_walking)
+            {
+                _bomb.ChangeActionState(BombManAction.idle);
+                Debug.Log("플레이어가 활동범위 밖이므로 추적 중지.");
+                _walking = false;
+            }
+
+            detectTimer = 0f;
+            return;
+        }
+
         Collider[] detect = Physics.OverlapSphere(transform.position, detectRadius, playerMask);
 
         if (detect.Length == 0)
@@ -66,14 +81,14 @@ public class BombStateHandler : MonoBehaviour
             return;
             
         }
-
+        /*
         float distance = Vector3.Distance(transform.position, _player.position);
         if (distance <= 1.5f && _readyExplode == false && _walking == true || _damaged)
         {
             _readyExplode = true;
             _bomb.ChangeActionState(BombManAction.explode);
         } 
-
+        */
         Vector3 dir = (_player.position - transform.position).normalized;
         float sight = Vector3.Angle(transform.forward, dir);
 
