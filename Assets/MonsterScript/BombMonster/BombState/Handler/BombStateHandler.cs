@@ -4,8 +4,7 @@ public class BombStateHandler : MonoBehaviour
 {
     private BombMan _bomb;
     private Transform _player;
-    private Collider _bombCollider, _detectCollider;
-    private Collider[] childColliders;
+    private Collider _bombCollider;
 
     private float detectRadius = 5f;
     private float frontAngle = 60f, backAngle = 150f;          
@@ -14,7 +13,6 @@ public class BombStateHandler : MonoBehaviour
 
     private float detectTimer = 0f;
     private bool _readyExplode, _walking, _damaged;
-
 
     public Transform Player => _player;
     public void Initialize(BombMan bomb)
@@ -31,20 +29,6 @@ public class BombStateHandler : MonoBehaviour
         }
             
         _player = p.transform;
-
-        childColliders = GetComponentsInChildren<Collider>();
-
-        foreach ( var col in childColliders )
-        {
-            if(col.name == "explodeCollider")
-            {
-                _bombCollider = col;
-            } 
-            else if (col.name == "detectCollider")
-            {
-                _detectCollider = col;
-            }
-        }
     }
 
     private void Update()
@@ -81,14 +65,14 @@ public class BombStateHandler : MonoBehaviour
             return;
             
         }
-        /*
+        
         float distance = Vector3.Distance(transform.position, _player.position);
         if (distance <= 1.5f && _readyExplode == false && _walking == true || _damaged)
         {
             _readyExplode = true;
             _bomb.ChangeActionState(BombManAction.explode);
         } 
-        */
+        
         Vector3 dir = (_player.position - transform.position).normalized;
         float sight = Vector3.Angle(transform.forward, dir);
 
@@ -107,6 +91,12 @@ public class BombStateHandler : MonoBehaviour
                 _bomb.ChangeActionState(BombManAction.walk);
                 _walking = true;
             }
+        }
+
+        if(_bomb.BombhpHandler.Damaged)
+        {
+            _bomb.ChangeActionState(BombManAction.walk);
+            _walking = true;
         }
     }
 

@@ -22,6 +22,7 @@ public class BombMan : CharacterBase
     private Rigidbody _rigidbody;
 
     private BombStateHandler _bombStateHandler;
+    private BombhpHandler _bombhpHandler;
     
     public Animator Animator => _animator;
     public Rigidbody Rigidbody => _rigidbody;
@@ -29,6 +30,7 @@ public class BombMan : CharacterBase
     public Area WanderArea => wanderArea;
     public Transform HandlerTransform => _handlerTransform;
     public BombStateHandler BombStateHandler => _bombStateHandler;
+    public BombhpHandler BombhpHandler => _bombhpHandler;
 
     protected override void Awake()
     {
@@ -36,11 +38,13 @@ public class BombMan : CharacterBase
         _agent = GetComponent<NavMeshAgent>();
 
        _bombStateHandler = _handlerTransform.GetComponent<BombStateHandler>();
+       _bombhpHandler = _handlerTransform.GetComponent<BombhpHandler>();
     }
 
     private void Start()
     {
         _bombStateHandler.Initialize(this);
+        _bombhpHandler.Initialize(this);
 
         SetUp();
     }

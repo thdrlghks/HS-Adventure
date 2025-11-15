@@ -435,7 +435,7 @@ Transform:
   m_GameObject: {fileID: 325272619}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 500, y: 0.5, z: 350}
+  m_LocalPosition: {x: 529.4, y: 0.5, z: 318.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2068,6 +2068,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1695092303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1695092293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8a69c0d44f7e5840ab80bcca4cdd5f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BombhpHandler
 --- !u!1 &1705290073
 GameObject:
   m_ObjectHideFlags: 0
@@ -2199,6 +2211,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1818861082154570, guid: 5e45c8f884f6d124ea0499aae7fdbec8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1695092300}
+    - targetCorrespondingSourceObject: {fileID: 1818861082154570, guid: 5e45c8f884f6d124ea0499aae7fdbec8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1695092303}
     - targetCorrespondingSourceObject: {fileID: 1818861082154570, guid: 5e45c8f884f6d124ea0499aae7fdbec8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1695092301}

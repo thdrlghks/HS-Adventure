@@ -21,7 +21,7 @@ public class BombIdle : State<BombMan>
 
         if (distance < 1.0f)
         {
-            bombman.Animator.SetBool("walk",false);
+            bombman.Animator.SetBool("walk", false);
             _idleTimer += Time.deltaTime;
 
             if (_idleTimer >= 3f)
