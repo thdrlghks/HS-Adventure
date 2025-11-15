@@ -38,7 +38,6 @@ public class BombhpHandler : MonoBehaviour
 
     private void Update()
     {
-        Attack(_monsterCollider, 3f);
         DestroyBombMan();
 
         if(cooltime > 0f)
@@ -53,6 +52,11 @@ public class BombhpHandler : MonoBehaviour
         _damaged = true;
         _bomb.Animator.SetBool("walk", false);
         _bomb.Animator.SetTrigger("damage");
+
+        if(_monsterCollider.CompareTag("sword"))
+        {
+            _bombHP = _bombHP - damage;
+        }
 
         _damageTimer += Time.deltaTime;
 

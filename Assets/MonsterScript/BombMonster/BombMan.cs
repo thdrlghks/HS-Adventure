@@ -15,9 +15,7 @@ public class BombMan : CharacterBase
     [SerializeField] private Transform _handlerTransform;
 
     public State<BombMan>[] _action;
-
     public StateMachine<BombMan> _actionMachine;
-
 
     private Rigidbody _rigidbody;
 
