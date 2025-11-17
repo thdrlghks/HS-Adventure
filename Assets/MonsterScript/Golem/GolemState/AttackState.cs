@@ -38,6 +38,10 @@ public class AttackState : State<Golem>
 
     public override void FixedExecute(Golem gol)
     {
+        if(!gol.GolemStateHandler.Attacking)
+        {
+            gol.ChangeActionState(GolemAction.Wander);
+        }
     }
 
     public override void Exit(Golem gol)

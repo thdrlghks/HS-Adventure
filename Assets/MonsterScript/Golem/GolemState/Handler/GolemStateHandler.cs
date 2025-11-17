@@ -73,26 +73,24 @@ public class GolemStateHandler : MonoBehaviour
         {
             gol.ChangeActionState(GolemAction.Attack);
             _attacking = true;
+
         }
 
         if(_attacking)
         {
             timer += Time.deltaTime;
-
-            if (timer > 5f)
+            if (timer >= 5f)
             {
-                if (distance <= 3f && _detected == true)
+                _attacking = false;
+                if (detect.Length == 0)
                 {
-                    gol.ChangeActionState(GolemAction.Attack);
-                    timer = 0f;
+                    gol.ChangeActionState(GolemAction.Wander);
                 }
                 else
                 {
                     gol.ChangeActionState(GolemAction.Detect);
-                    timer = 0;
-                    _attacking = false;
                 }
-
+                timer = 0f;
             }
         }
 
@@ -129,6 +127,15 @@ public class GolemStateHandler : MonoBehaviour
         _damaged = true;
     }
 
+    public void exitAttackMode()
+    {
+        _attacking = false;
+    }
+
+    public void timerReset()
+    {
+        timer = 0f;
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1f, 1f, 1f, 0.1f);
