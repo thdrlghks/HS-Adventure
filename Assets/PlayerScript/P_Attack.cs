@@ -1,10 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
+public enum WeaponType
+{
+    Sword,
+    Bow,
+    Bomb
+}
 
 public class P_Attack : MonoBehaviour
 {
+    [Header("무기 설정")]
+    public WeaponType currentWeapon = WeaponType.Sword;
+
+    [Header("무기 오브젝트")]
+    public GameObject swordObject;
+    public GameObject bowObject;
+    public GameObject bombObject;
+
     [Header("공격 설정")]
-    public float attackTurnSpeed = 10f;
     public float comboResetTime = 0.9f;
 
     private Animator animator;
@@ -25,13 +38,12 @@ public class P_Attack : MonoBehaviour
     public float[] comboDurations = new float[3];
     private readonly string[] comboClipNames = { "Attack1", "Attack2", "Attack3" };
 
-    private Quaternion targetRot;
-    private Coroutine attackRoutine = null;
 
     private bool isShielding = false;
     public bool IsShielding => isShielding;
 
-    private bool rollQueued = false;    
+    private bool rollQueued = false;
+    private Coroutine attackRoutine = null;
 
     void Start()
     {
@@ -44,6 +56,8 @@ public class P_Attack : MonoBehaviour
 
     void Update()
     {
+        HandleWeaponSwitch();
+
         if (move != null && move.isRolling)
             return;
 
@@ -51,7 +65,6 @@ public class P_Attack : MonoBehaviour
 
         if (isShielding)
         {
-            RotateToCameraDirection();
             return;
         }
 
@@ -61,10 +74,27 @@ public class P_Attack : MonoBehaviour
             HandleAttackInput();
         }
 
-        /*if (isAttacking && currentCombo == 0)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * attackTurnSpeed);
-        }*/
+    }
+
+    void HandleWeaponSwitch()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            currentWeapon = WeaponType.Sword;
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+            currentWeapon = WeaponType.Bow;
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+            currentWeapon = WeaponType.Bomb;
+
+        //animator.SetInteger("WeaponID", (int)currentWeapon);
+        UpdateWeaponModel();
+    }
+    void UpdateWeaponModel()
+    {
+        if (swordObject != null) swordObject.SetActive(currentWeapon == WeaponType.Sword);
+        if (bowObject != null) bowObject.SetActive(currentWeapon == WeaponType.Bow);
+        if (bombObject != null) bombObject.SetActive(currentWeapon == WeaponType.Bomb);
     }
 
     // ============================================
@@ -142,11 +172,10 @@ public class P_Attack : MonoBehaviour
                 isShielding = false;
                 animator.SetBool("Shield", false);
                 move.StartRoll(dir);
+                
                 return;
             }
 
-            // Shield 유지 중에는 카메라 방향으로 회전
-            RotateToCameraDirection();
             return;
         }
 
@@ -158,24 +187,31 @@ public class P_Attack : MonoBehaviour
         }
     }
 
-    void RotateToCameraDirection()
+    // ----------------------------------------------
+    // 공격 입력 분기
+    // ----------------------------------------------
+    void HandleAttackInput()
     {
-        if (move == null || move.cameraTransform == null) return;
-
-        Vector3 camDir = move.cameraTransform.forward;
-        camDir.y = 0f;
-
-        if (camDir.sqrMagnitude > 0.01f)
+        switch (currentWeapon)
         {
-            Quaternion targetRot = Quaternion.LookRotation(camDir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
+            case WeaponType.Sword:
+                HandleSwordAttack();
+                break;
+
+            case WeaponType.Bow:
+                HandleBowAttack();
+                break;
+
+            case WeaponType.Bomb:
+                HandleBombAttack();
+                break;
         }
     }
 
     // --------------------------------------------
-    // 공격 입력 처리
+    // 검 공격
     // --------------------------------------------
-    void HandleAttackInput()
+    void HandleSwordAttack()
     {
         if (currentCombo == comboTriggers.Length - 1 && isAttacking)
             return;
@@ -212,23 +248,6 @@ public class P_Attack : MonoBehaviour
     }
 
     // --------------------------------------------
-    // 첫타 회전 계산
-    // --------------------------------------------
-    void CalculateFirstHitTurn()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
-        {
-            Vector3 dir = hit.point - transform.position;
-            dir.y = 0;
-
-            if (dir.sqrMagnitude > 0.1f)
-                targetRot = Quaternion.LookRotation(dir);
-        }
-    }
-
-    // --------------------------------------------
     // 공격 실행
     // --------------------------------------------
     IEnumerator PerformAttack()
@@ -237,9 +256,6 @@ public class P_Attack : MonoBehaviour
         comboQueued = false;
         canCombo = false;
         rollQueued = false;         // 🔥 새 공격마다 초기화
-
-        if (currentCombo == 0)
-            CalculateFirstHitTurn();
 
         animator.SetTrigger(comboTriggers[currentCombo]);
 
@@ -336,4 +352,27 @@ public class P_Attack : MonoBehaviour
         comboQueued = false;
         currentCombo = 0;
     }
+
+    // ----------------------------------------------
+    // 활 공격
+    // ----------------------------------------------
+    void HandleBowAttack()
+    {
+        animator.SetTrigger("BowAttack");
+
+        // TODO: 화살 발사 로직 추가
+        // arrowManager.ShootArrow();
+    }
+
+    // ----------------------------------------------
+    // 폭탄 공격
+    // ----------------------------------------------
+    void HandleBombAttack()
+    {
+        animator.SetTrigger("BombThrow");
+
+        // TODO: 폭탄 생성 및 포물선 적용
+        // Instantiate(bombPrefab, hand.position, hand.rotation);
+    }
+
 }

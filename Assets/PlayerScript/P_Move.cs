@@ -9,12 +9,18 @@ public class P_Move : MonoBehaviour
     public float runSpeed = 6f;
     public float crouchSpeed = 1.5f;
     public float rotationSmooth = 10f;
+    private bool canMove = true;
 
     [Header("점프 설정")]
-    public float jumpHeight = 1.2f;
+    public float jumpHeight = 2.2f;
     public float gravity = -9.81f;
     private float verticalVelocity = 0f;
-
+    [Header("점프 물리 보정")]
+    public float jumpUpMultiplier = 0.8f;      // 상승 중 중력 보정
+    public float fallMultiplier = 2.5f;        // 하강 가속도 (더 무거워짐)
+    public float lowJumpMultiplier = 3.0f;     // 점프키 떼면 더 빨리 떨어짐
+    private bool wasGroundedLastFrame = true;
+    
     [Header("웅크리기 설정")]
     public float crouchHeight = 1.0f;
     private float originalHeight;
@@ -32,7 +38,7 @@ public class P_Move : MonoBehaviour
     // 회피
     public bool isRolling = false;
     public float rollSpeed = 8f;
-    public float rollDuration = 0.7f;
+    public float rollDuration = 0.5f;
 
     void Start()
     {
@@ -55,6 +61,11 @@ public class P_Move : MonoBehaviour
             Cursor.visible = true;
         }
 
+        if (!canMove)
+        {
+            animator.SetFloat("Speed", 0f);
+            return;
+        }
 
         // 회피 중 이동 금지
         if (isRolling)
@@ -125,6 +136,13 @@ public class P_Move : MonoBehaviour
         }
 
         isRolling = false;
+        StartCoroutine(RollRecoveryDelay());
+    }
+    IEnumerator RollRecoveryDelay()
+    {
+        canMove = false;
+        yield return new WaitForSeconds(0.1f);  // 원하는 후딜 시간
+        canMove = true;
     }
 
     public Vector3 GetCameraRelativeInputDir()
@@ -153,6 +171,8 @@ public class P_Move : MonoBehaviour
     // ----------------------------------------
     void HandleJump()
     {
+        bool isGroundedNow = controller.isGrounded;
+
         if (controller.isGrounded)
         {
             if (verticalVelocity < 0f)
@@ -160,12 +180,53 @@ public class P_Move : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space) && !isCrouching)
             {
+                // 현실적인 점프 높이
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 animator.SetTrigger("Jump");
             }
         }
 
+        // ✨ 상승 중 (Key 유지 시)
+        if (verticalVelocity > 0 && Input.GetKey(KeyCode.Space))
+        {
+            verticalVelocity += gravity * jumpUpMultiplier * Time.deltaTime;
+        }
+        // ✨ Space 떼면 더 빨리 떨어짐 (짧은 점프 가능)
+        else if (verticalVelocity > 0 && !Input.GetKey(KeyCode.Space))
+        {
+            verticalVelocity += gravity * lowJumpMultiplier * Time.deltaTime;
+        }
+        // ✨ 하강 중 (중력 강화)
+        else if (verticalVelocity < 0)
+        {
+            verticalVelocity += gravity * fallMultiplier * Time.deltaTime;
+        }
+
+        // 마지막: 중력 적용
         verticalVelocity += gravity * Time.deltaTime;
+
+        if (!wasGroundedLastFrame && isGroundedNow)
+        {
+            // 🔥 착지 강도에 따른 조건 분기
+            if (verticalVelocity < -5f)
+            {
+                animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션
+                StartCoroutine(LandingDelay(0.2f));
+            }
+            else
+            {
+                StartCoroutine(LandingDelay(0.05f));
+            }
+        }
+
+        wasGroundedLastFrame = isGroundedNow;
+    }
+
+    IEnumerator LandingDelay(float landingDelayTime)
+    {
+        canMove = false;
+        yield return new WaitForSeconds(landingDelayTime);  // 착지 느낌용 텀
+        canMove = true;
     }
 
     // ----------------------------------------
