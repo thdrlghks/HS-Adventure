@@ -7,7 +7,7 @@ public class P_Move : MonoBehaviour
     [Header("이동 속도 설정")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
-    public float crouchSpeed = 1.5f;
+    public float shieldSpeed = 1.5f;
     public float rotationSmooth = 10f;
     private bool canMove = true;
 
@@ -15,16 +15,18 @@ public class P_Move : MonoBehaviour
     public float jumpHeight = 2.2f;
     public float gravity = -9.81f;
     private float verticalVelocity = 0f;
+    private bool isJumping = false;
     [Header("점프 물리 보정")]
     public float jumpUpMultiplier = 0.8f;      // 상승 중 중력 보정
     public float fallMultiplier = 2.5f;        // 하강 가속도 (더 무거워짐)
     public float lowJumpMultiplier = 3.0f;     // 점프키 떼면 더 빨리 떨어짐
     private bool wasGroundedLastFrame = true;
-    
-    [Header("웅크리기 설정")]
+    private float jumpTime = 0f;
+
+    /*[Header("웅크리기 설정")]
     public float crouchHeight = 1.0f;
     private float originalHeight;
-    private bool isCrouching = false;
+    private bool isCrouching = false;*/
 
     [Header("카메라 참조")]
     public Transform cameraTransform;
@@ -44,7 +46,7 @@ public class P_Move : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         attack = GetComponent<P_Attack>();
-        originalHeight = controller.height;
+        //originalHeight = controller.height;
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
@@ -59,7 +61,7 @@ public class P_Move : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-        }
+        } // 임시
 
         if (!canMove)
         {
@@ -74,21 +76,14 @@ public class P_Move : MonoBehaviour
             return;
         }
 
-        // 방어 중 이동 금지
-        if (attack != null && attack.IsShielding)
-        {
-            animator.SetFloat("Speed", 0f);
-            return;
-        }
-
         // 공격 중 이동 금지
         if (attack != null && attack.IsAttacking)
         {
             animator.SetFloat("Speed", 0f);
             return;
         }
-
-        HandleCrouch();
+        
+        //HandleCrouch();
         HandleMovement();
         HandleJump();
     }
@@ -178,12 +173,18 @@ public class P_Move : MonoBehaviour
             if (verticalVelocity < 0f)
                 verticalVelocity = -2f;
 
-            if (Input.GetKeyDown(KeyCode.Space) && !isCrouching)
+            if (Input.GetKeyDown(KeyCode.Space) /*&& !isCrouching*/)
             {
                 // 현실적인 점프 높이
+                isJumping = true;
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 animator.SetTrigger("Jump");
             }
+        }
+
+        if (isJumping)
+        {
+            jumpTime += Time.deltaTime;
         }
 
         // ✨ 상승 중 (Key 유지 시)
@@ -207,15 +208,21 @@ public class P_Move : MonoBehaviour
 
         if (!wasGroundedLastFrame && isGroundedNow)
         {
+            isJumping = false;
             // 🔥 착지 강도에 따른 조건 분기
-            if (verticalVelocity < -5f)
+            if (jumpTime > 0.7f)
+            {
+                animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션
+                StartCoroutine(LandingDelay(0.6f));
+            }
+            else if (jumpTime > 0.6f)
             {
                 animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션
                 StartCoroutine(LandingDelay(0.2f));
             }
             else
             {
-                StartCoroutine(LandingDelay(0.05f));
+                StartCoroutine(LandingDelay(0.02f));
             }
         }
 
@@ -224,6 +231,7 @@ public class P_Move : MonoBehaviour
 
     IEnumerator LandingDelay(float landingDelayTime)
     {
+        jumpTime = 0f;
         canMove = false;
         yield return new WaitForSeconds(landingDelayTime);  // 착지 느낌용 텀
         canMove = true;
@@ -232,9 +240,8 @@ public class P_Move : MonoBehaviour
     // ----------------------------------------
     // 웅크리기 처리
     // ----------------------------------------
-    void HandleCrouch()
+    /*void HandleCrouch()
     {
-        // 왼쪽 컨트롤 키를 누르고 있으면 crouch, 떼면 stand
         if (Input.GetKey(KeyCode.LeftControl))
         {
             // 웅크리기 ON
@@ -255,7 +262,7 @@ public class P_Move : MonoBehaviour
                 animator.SetBool("Crouch", false);
             }
         }
-    }
+    }*/
 
 
     // ----------------------------------------
@@ -279,10 +286,10 @@ public class P_Move : MonoBehaviour
         float currentSpeed = walkSpeed;
 
         // Shift + 이동 = 달리기
-        if (Input.GetKey(KeyCode.LeftShift) && isMoving && !isCrouching)
+        if (Input.GetKey(KeyCode.LeftShift) && isMoving && !attack.IsShielding)
             currentSpeed = runSpeed;
-        else if (isCrouching)
-            currentSpeed = crouchSpeed;
+        else if (attack.IsShielding)
+            currentSpeed = shieldSpeed;
 
         Vector3 velocity = inputDir * currentSpeed;
         velocity.y = verticalVelocity;
@@ -298,9 +305,9 @@ public class P_Move : MonoBehaviour
         // Speed 애니메이션
         float animSpeed = 0;
 
-        if (isCrouching)
+        if (attack.IsShielding)
             animSpeed = isMoving ? 0.5f : 0f;
-        else if (currentSpeed == runSpeed)
+        if (currentSpeed == runSpeed)
             animSpeed = 2f;
         else if (isMoving)
             animSpeed = 1f;
