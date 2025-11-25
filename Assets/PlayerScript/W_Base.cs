@@ -21,3 +21,4 @@ public abstract class W_Base : MonoBehaviour
     public virtual bool IsAttacking => false;
     public virtual bool IsShielding => false;
 }
+    
