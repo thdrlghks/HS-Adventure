@@ -8,7 +8,7 @@ public class GolemStateHandler : MonoBehaviour
 
     private float detectRadius = 10f, timer = 0f    ;
     private float frontAngle = 60f, backAngle = 150f;
-    private float detectlimit = 3f;
+    private float detectlimit = 1f;
     public LayerMask playerMask;
 
     private float detectTimer = 0f;
@@ -82,7 +82,7 @@ public class GolemStateHandler : MonoBehaviour
             if (timer >= 5f)
             {
                 _attacking = false;
-                if (detect.Length == 0)
+                if (detect.Length == 0 && _detected == false)
                 {
                     gol.ChangeActionState(GolemAction.Wander);
                 }
