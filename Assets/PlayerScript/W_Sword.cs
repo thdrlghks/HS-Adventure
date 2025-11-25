@@ -3,7 +3,7 @@ using System.Collections;
 
 public class W_Sword : W_Base
 {
-    private int combo = 0;
+    private int comboIndex = 0;
     private bool isAttacking = false;
     private bool canCombo = false;
     private bool comboQueued = false;
@@ -16,7 +16,7 @@ public class W_Sword : W_Base
     public float[] comboDurations = new float[3];
 
     private readonly string[] comboClipNames = { "Attack1", "Attack2", "Attack3" };
-
+    public int[] comboDamages = { 10, 15, 25 };
     private Coroutine routine;
 
     public override bool IsAttacking => isAttacking;
@@ -61,16 +61,10 @@ public class W_Sword : W_Base
     // ------------------------------
     public override void Attack()
     {
-        if (!controller.isGrounded)
-            return;
+        if (!controller.isGrounded) return;
+        if (move.isRolling) return;
+        if (IsShielding) return;
 
-        if (move.isRolling)
-            return;
-
-        if (IsShielding)
-            return;
-
-        // 기존 로직 그대로 옮긴 것
         if (isAttacking)
         {
             if (!canCombo)
@@ -79,11 +73,10 @@ public class W_Sword : W_Base
                 return;
             }
 
-            // 콤보 진행
             canCombo = false;
             comboQueued = false;
 
-            combo = Mathf.Min(combo + 1, comboTriggers.Length - 1);
+            comboIndex = Mathf.Min(comboIndex + 1, comboTriggers.Length - 1);
 
             if (routine != null)
                 owner.StopCoroutine(routine);
@@ -92,7 +85,7 @@ public class W_Sword : W_Base
             return;
         }
 
-        combo = 0;
+        comboIndex = 0;
         comboQueued = false;
 
         if (routine != null)
@@ -113,10 +106,10 @@ public class W_Sword : W_Base
         comboQueued = false;
         rollQueued = false;
 
-        animator.SetTrigger(comboTriggers[combo]);
+        animator.SetTrigger(comboTriggers[comboIndex]);
 
-        float minTime = comboMinTimes[combo];
-        float duration = comboDurations[combo];
+        float minTime = comboMinTimes[comboIndex];
+        float duration = comboDurations[comboIndex];
         float timer = 0f;
 
         // 1) 최소 시간 동안 콤보/롤 금지
@@ -155,7 +148,7 @@ public class W_Sword : W_Base
             {
                 comboQueued = false;
                 canCombo = false;
-                combo = Mathf.Min(combo + 1, comboTriggers.Length - 1);
+                comboIndex = Mathf.Min(comboIndex + 1, comboTriggers.Length - 1);
 
                 routine = owner.StartCoroutine(DoAttack());
                 yield break;
@@ -167,7 +160,7 @@ public class W_Sword : W_Base
 
         // 3) 애니 끝날 때까지 대기
         float remain = duration - minTime - 1.5f;
-        if (combo == 0)
+        if (comboIndex == 0)
             remain -= 0.5f;
 
         if (remain > 0)
@@ -213,7 +206,7 @@ public class W_Sword : W_Base
         isAttacking = false;
         canCombo = false;
         comboQueued = false;
-        combo = 0;
+        comboIndex = 0;
     }
 
 
