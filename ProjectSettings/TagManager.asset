@@ -4,7 +4,8 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - sword
+  - Enemy
+  - Weapon
   layers:
   - Default
   - TransparentFX

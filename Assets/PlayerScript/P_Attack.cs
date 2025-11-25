@@ -1,62 +1,98 @@
 ﻿using UnityEngine;
 using System.Collections;
+public enum WeaponType
+{
+    Sword,
+    Bow,
+    Bomb,
+}
 
 public class P_Attack : MonoBehaviour
 {
-    [Header("공격 설정")]
-    public float attackTurnSpeed = 10f;   // 회전 속도
-    public float attackDuration = 1f;     // 공격 애니메이션 길이
-    public string attackTrigger = "Attack1";
-
     private Animator animator;
-    private bool isAttacking = false;
-    public bool IsAttacking => isAttacking;
+    private CharacterController characterController;
+    private P_Move move;
+    public W_Base[] weapons;
+    private W_Base currentWeapon;
 
-    private Quaternion targetRot;  // 목표 회전
+    public GameObject shield;
+
+    void Awake()
+    {
+        animator = GetComponentInChildren<Animator>();
+        characterController = GetComponent<CharacterController>();
+        move = GetComponent<P_Move>();
+    }
 
     void Start()
     {
-        animator = GetComponentInChildren<Animator>();
+        foreach (var w in weapons)
+        {
+            w.Init(this);
+            w.gameObject.SetActive(false);
+        }
+
+        Equip(WeaponType.Sword);
     }
 
     void Update()
     {
-        // 공격 입력
-        if (Input.GetMouseButtonDown(0) && !isAttacking)
-        {
-            StartCoroutine(PerformAttack());
-        }
+        HandleWeaponSwitch();
+        currentWeapon.OnUpdate();
 
-        // 공격 중에는 회전만 유지
-        if (isAttacking)
+        if (Input.GetMouseButtonDown(0))
+            currentWeapon.Attack();
+    }
+
+    // ======================================
+    //   📌 숫자키로 무기 교체
+    // ======================================
+    void HandleWeaponSwitch()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * attackTurnSpeed);
+            Equip(WeaponType.Sword);
+            Debug.Log("무기 교체: Sword");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Equip(WeaponType.Bow);
+            Debug.Log("무기 교체: Bow");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Equip(WeaponType.Bomb);
+            Debug.Log("무기 교체: Bomb");
         }
     }
 
-    IEnumerator PerformAttack()
+    public void Equip(WeaponType type)
     {
-        isAttacking = true;
+        if (currentWeapon == weapons[(int)type])
+            return;
 
-        // 공격 시작 시, 마우스 바라보는 방향 계산
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
+        // 공격 중이면 즉시 중단
+        if (currentWeapon != null)
         {
-            Vector3 targetDir = hit.point - transform.position;
-            targetDir.y = 0f;
-
-            if (targetDir.sqrMagnitude > 0.01f)
-                targetRot = Quaternion.LookRotation(targetDir);
-            else
-                targetRot = transform.rotation;
+            currentWeapon.StopImmediately();
+            currentWeapon.gameObject.SetActive(false);
         }
 
-        // 애니메이션 실행
-        animator.SetTrigger(attackTrigger);
+        currentWeapon = weapons[(int)type];
+        currentWeapon.gameObject.SetActive(true);
 
-        // 공격 중 2초 동안 회전 보정 유지
-        yield return new WaitForSeconds(attackDuration);
+        if((int)type == 0) shield.SetActive(true);
+        else shield.SetActive(false);
+    }
 
-        isAttacking = false;
+    public Animator GetAnimator() => animator;
+    public CharacterController GetCharacterController() => characterController;
+    public P_Move GetMove() => move;
+    public bool IsAttacking => currentWeapon != null && currentWeapon.IsAttacking;
+    public bool IsShielding => currentWeapon != null && currentWeapon.IsShielding;
+    public void StopAttackImmediately()
+    {
+        if (currentWeapon != null)
+            currentWeapon.StopImmediately();
     }
 }

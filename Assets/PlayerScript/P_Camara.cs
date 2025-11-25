@@ -37,9 +37,23 @@ public class P_Camara : MonoBehaviour
     {
         if (!cameraPivot) return;
 
+        FollowPlayerPositionOnly();
+
         HandleRotation();
         HandleZoom();
         HandleCollision();
+    }
+
+    void FollowPlayerPositionOnly()
+    {
+        // 플레이어 스켈레톤의 위치를 가져옴
+        // cameraPivot 의 부모가 PlayerSkel 이 아님. 독립 오브젝트여야 함.
+        Transform player = cameraPivot.parent;
+
+        if (player != null)
+        {
+            cameraPivot.position = player.position + new Vector3(0, 1f, 0);
+        }
     }
 
     void HandleRotation()
