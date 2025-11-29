@@ -12,9 +12,16 @@ public class P_Player : MonoBehaviour
 
     private CharacterController controller;
 
+    private P_Attack attackSystem;
+    private P_Move moveSystem;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
+
+        attackSystem = GetComponent<P_Attack>();
+        moveSystem = GetComponent<P_Move>();
+
         currentHP = maxHP;
         ui.UpdateHealth(currentHP, maxHP);
     }
@@ -33,9 +40,28 @@ public class P_Player : MonoBehaviour
 
     void TakeDamage(int amount)
     {
-        currentHP -= amount;
+        if (moveSystem != null && moveSystem.IsInvincible)
+        {
+            Debug.Log("회피 무적! 데미지 무시됨");
+            return;
+        }
+        float reduction = 0f;
+
+        if (attackSystem != null && attackSystem.currentWeapon != null)
+        {
+            reduction = attackSystem.currentWeapon.GetDamageReductionRate();
+        }
+        int finalDamage = (int)(amount * (1f - reduction));
+        currentHP -= finalDamage;
         currentHP = Mathf.Max(currentHP, 0);
+
         ui.UpdateHealth(currentHP, maxHP);
-        Debug.Log("HP: " + currentHP);
+        Debug.Log($"받은 데미지: {amount}, 감소율: {reduction * 100}%, 최종 피해: {finalDamage}, 남은 HP: {currentHP}");
+
+        if (currentHP <= 0)
+        {
+            // 사망 처리 (필요시 추가)
+            // Die(); 
+        }
     }
 }

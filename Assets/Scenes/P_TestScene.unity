@@ -119,6 +119,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &204231203
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 204231204}
+  m_Layer: 0
+  m_Name: firePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &204231204
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204231203}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.19813336, y: -0.62345725, z: -0.09766212, w: 0.7500043}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6671125761073797703}
+  m_LocalEulerAnglesHint: {x: 6.9, y: -90, z: -9.349}
 --- !u!1 &349633221
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,6 +606,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 712929575}
   m_CullTransparentMesh: 1
+--- !u!1 &714423179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 714423180}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &714423180
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714423179}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4970598108008849184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &761011119
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,6 +726,7 @@ MonoBehaviour:
   - {fileID: 4048538500372042353}
   - {fileID: 6671125761073797704}
   - {fileID: 8204136337970161678}
+  currentWeapon: {fileID: 0}
   shield: {fileID: 8076033158951100355}
 --- !u!114 &763435291
 MonoBehaviour:
@@ -686,11 +749,18 @@ MonoBehaviour:
   jumpUpMultiplier: 0.8
   fallMultiplier: 2.5
   lowJumpMultiplier: 3
+  climbLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  climbCheckDistance: 1
+  climbHeightOffset: 1.2
+  climbSpeed: 3
   cameraTransform: {fileID: 436072752}
   animator: {fileID: 0}
   isRolling: 0
   rollSpeed: 8
   rollDuration: 0.5
+  invincibilityDuration: 0.4
 --- !u!143 &763435292
 CharacterController:
   m_ObjectHideFlags: 0
@@ -709,13 +779,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.5
+  m_Height: 1.45
   m_Radius: 0.45
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.83, z: 0}
+  m_Center: {x: 0, y: 0.805, z: 0}
 --- !u!114 &763435293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1861,7 +1931,7 @@ GameObject:
   - component: {fileID: 1909333306}
   - component: {fileID: 1909333305}
   - component: {fileID: 1909333304}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube 1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -2182,6 +2252,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934085678}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1958152336
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1958152337}
+  m_Layer: 0
+  m_Name: throwPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1958152337
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1958152336}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4970598108008849184}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &72689702123912307
 GameObject:
   m_ObjectHideFlags: 0
@@ -2255,7 +2356,6 @@ Transform:
   m_Children:
   - {fileID: 9099828240941441732}
   - {fileID: 3703257401841633493}
-  - {fileID: 6671125761073797703}
   - {fileID: 4970598108008849184}
   m_Father: {fileID: 6580484432442493392}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2576,6 +2676,7 @@ Transform:
   m_Children:
   - {fileID: 3827207709861465003}
   - {fileID: 8887860401744512377}
+  - {fileID: 6671125761073797703}
   m_Father: {fileID: 3777104977437199752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2039205540844394901
@@ -3179,7 +3280,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &3536200061621682004
 GameObject:
   m_ObjectHideFlags: 0
@@ -8548,15 +8649,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9e9c68c3710f654eaac8b6163858534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::W_Sword
+  weaponOverride: {fileID: 22100000, guid: cf2a66f08d263f84eb7156eafe940668, type: 2}
   comboMinTimes:
   - 0.6
   - 1
   - 1.3
   comboDurations:
-  - 0
-  - 0
-  - 0
+  - 1.2
+  - 2.6
+  - 2.7
   comboDamages: 0a0000000f00000019000000
+  shieldGuardRate: 0.7
 --- !u!4 &4112990893880066419
 Transform:
   m_ObjectHideFlags: 0
@@ -8793,12 +8896,14 @@ Transform:
   m_GameObject: {fileID: 3464923275330033493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 0, z: 0.062}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7085560366252763897}
   - {fileID: 1056613479462738640}
+  - {fileID: 714423180}
+  - {fileID: 1958152337}
   m_Father: {fileID: 346256252111427356}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!1 &5091294055022206967
@@ -19058,16 +19163,17 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6331860021188657405}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0.026, y: 0.07, z: -0.009}
+  m_LocalRotation: {x: -0.039925024, y: 0.2794032, z: 0.79111505, w: -0.54265726}
+  m_LocalPosition: {x: -0.034, y: 0.13, z: -0.015}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6068293688780106614}
   - {fileID: 7969317481288045208}
   - {fileID: 7465506435525102951}
-  m_Father: {fileID: 346256252111427356}
-  m_LocalEulerAnglesHint: {x: 180, y: 90, z: 90}
+  - {fileID: 204231204}
+  m_Father: {fileID: 1865330582348055386}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!114 &6671125761073797704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19080,6 +19186,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aa9e8ab9c5894846bb8562e97ff3d98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::W_Bow
+  weaponOverride: {fileID: 22100000, guid: a7d1540a9c0ddc646b249cf132a3dee7, type: 2}
+  arrowPrefab: {fileID: 1959729250425484, guid: 15dc8c280651fdb4896025ad82e6e302, type: 3}
+  firePoint: {fileID: 204231204}
+  fireDelay: 0.1
+  minForce: 15
+  maxForce: 40
+  maxChargeTime: 2
+  attackCooldown: 1
+  aimRotationSpeed: 15
 --- !u!4 &6981801725260888974
 Transform:
   m_ObjectHideFlags: 0
@@ -19631,6 +19746,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69e946f84b24a84428f324e67d332888, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::W_Bomb
+  weaponOverride: {fileID: 22100000, guid: 2f11a20f1ea45dc438abb1925a7e145e, type: 2}
+  bombPrefab: {fileID: 2595720090088871617, guid: 732e12a252da64507987819a344450d8, type: 3}
+  throwPoint: {fileID: 1958152337}
+  throwDelay: 0.3
+  throwForce: 15
+  throwUpwardForce: 2
 --- !u!23 &8223532512879235478
 MeshRenderer:
   m_ObjectHideFlags: 0

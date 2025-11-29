@@ -13,7 +13,7 @@ public class P_Attack : MonoBehaviour
     private CharacterController characterController;
     private P_Move move;
     public W_Base[] weapons;
-    private W_Base currentWeapon;
+    public W_Base currentWeapon;
 
     public GameObject shield;
 
@@ -81,7 +81,9 @@ public class P_Attack : MonoBehaviour
         currentWeapon = weapons[(int)type];
         currentWeapon.gameObject.SetActive(true);
 
-        if((int)type == 0) shield.SetActive(true);
+        currentWeapon.OnEquip();
+
+        if ((int)type == 0) shield.SetActive(true);
         else shield.SetActive(false);
     }
 
