@@ -20154,6 +20154,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bomb
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ffdfad76d2f7648d19c79be026141ab7, type: 3}
+      propertyPath: m_TagString
+      value: bomb
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

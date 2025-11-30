@@ -31,7 +31,7 @@ public class monsterShoot : MonoBehaviour
 
         Vector3 dir = target - transform.position;
         float dist = dir.magnitude;
-        dir.y += dist * 0.3f;
+        dir.y += dist * 0.2f;
 
         rb.AddForce(dir.normalized * (power + dist * 0.2f), ForceMode.VelocityChange);
 

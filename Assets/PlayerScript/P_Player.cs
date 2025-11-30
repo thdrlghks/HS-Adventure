@@ -96,7 +96,7 @@ public class P_Player : MonoBehaviour
         }
     }
 
-    void TakeDamage(int amount)
+    public void TakeDamage(int amount)
     {
         if (moveSystem != null && moveSystem.IsInvincible)
         {

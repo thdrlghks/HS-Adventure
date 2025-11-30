@@ -1,14 +1,19 @@
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class GolemAttackHandler : MonoBehaviour
 {
     private Golem gol;
+    private W_Sword sword1;
 
-    private Collider[] childColliders;
-    private Collider _bodyCollider, _leftArmCollider, _rightArmCollider, _legCollider;
+    private P_Player _player;
 
-    private float _golemHP = 100f, _damageTimer;
-    private bool _damaged;
+    [SerializeField] private ArmHitBox hit1;
+    [SerializeField] private ArmHitBox hit2;
+    [SerializeField] private ArmHitBox hit3;
+
+    private float _golemHP = 100f,_currrentHp, _damageTimer, combotimer, combo;
+    private bool _damaged, attacking;
     public void Initialize(Golem golem)
     {
         gol = golem;
@@ -16,27 +21,24 @@ public class GolemAttackHandler : MonoBehaviour
 
     private void Awake()
     {
-        childColliders = GetComponentsInChildren<Collider>();
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        _player = p.GetComponent<P_Player>();
 
-        foreach (var col in childColliders)
+        if (p == null)
         {
-            if (col.name == "B-chest")
-            {
-                _bodyCollider = col;
-            }
-            else if (col.name == "B-forearm.L")
-            {
-                _leftArmCollider = col;
-            }
-            else if (col.name == "B-forearm.R")
-            {
-                _rightArmCollider = col;
-            }
-            else if (col.name == "B-shin.R")
-            {
-                _legCollider = col;
-            }
+            Debug.Log("플레이어를 찾을 수 없습니다.");
+            return;
         }
+
+        GameObject sword = GameObject.FindGameObjectWithTag("sword");
+        if(sword == null)
+        {
+            Debug.Log("오브젝트 탐색 실패");
+            return;
+        }
+
+        _currrentHp = _golemHP;
+        sword1 = sword.GetComponent<W_Sword>();
     }
 
     private void Update()
@@ -52,46 +54,90 @@ public class GolemAttackHandler : MonoBehaviour
             _damaged = false;
             _damageTimer = 0;
         }
-    }
 
-    public void isDamaged(float damage)
-    {
-        if(_damaged) return;
-
-        if (_bodyCollider.CompareTag("sword") && _leftArmCollider.CompareTag("sword") && _rightArmCollider.CompareTag("sword"))
+        if (_currrentHp != _golemHP)
         {
-            _golemHP = _golemHP - damage;
-            _damaged = true;
+            Debug.Log(_currrentHp);
+            if (_currrentHp <= 0f)
+            {
+                Destroy(gameObject);
+            }
+            _golemHP = _currrentHp;
+            _damaged = false;
+        }
+
+        if (attacking)
+        {
+            combotimer += Time.deltaTime;
         }
     }
-    
 
     public void Attack(float mode, float damage)
     {
         if (mode == 0)
         {
-            if (_leftArmCollider.CompareTag("Player") && _rightArmCollider.CompareTag("Player"))
-            {
-                //플레이어 hp감소 로직 삽입 부분
-            }
+            hit1.active = true;
+            hit2.active = true;
         }
         else if (mode == 1)
         {
-            if(_legCollider.CompareTag("Player") && _rightArmCollider.CompareTag("Player") && _leftArmCollider.CompareTag("Player"))
-            {
-                //플레이어 hp감소 로직 삽입 부분
-            }
+            hit1.active = true;
+            hit2.active = true;
+            hit3.active = true;
         }
         else
         {
-            if (_golemHP < 100)
+            _currrentHp += 10f;
+        }
+    }
+
+    public void Reset()
+    {
+        hit1.active = false;
+        hit2.active = false;
+        hit3.active = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("sword") && sword1._isAttacking)
+        {
+
+            if (combotimer >= 2f)
             {
-                _golemHP += 10f;
-                if (_golemHP > 100)
-                {
-                    _golemHP = 100;
-                }
+                attacking = false;
+                combo = 0;
             }
+
+            if (combo == 0)
+            {
+                attacking = true;
+                _currrentHp -= 10f;
+                combo++;
+                combotimer = 0f;
+            }
+            else if (combo == 1)
+            {
+                _currrentHp -= 15f;
+                combo++;
+                combotimer = 0f;
+            }
+            else if (combo == 2)
+            {
+                _currrentHp -= 25f;
+                combo = 0;
+                attacking = false;
+                combotimer = 0f;
+            }
+        }
+        if (other.CompareTag("arrow"))
+        {
+            _currrentHp -= 10f;
+        }
+
+        if (other.CompareTag("bomb"))
+        {
+            _currrentHp -= 30;
         }
     }
 }

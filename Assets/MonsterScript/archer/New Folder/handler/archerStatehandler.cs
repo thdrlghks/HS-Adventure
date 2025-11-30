@@ -4,14 +4,18 @@ public class archerStatehandler : MonoBehaviour
 {
     private Archer ar;
     private Transform _player;
+    private W_Sword sword1;
 
     private float detectRadius = 25f, timer = 0f;
     private float frontAngle = 60f, backAngle = 150f;
     private float detectlimit = 1f;
     public LayerMask playerMask;
 
-    private float detectTimer = 0f;
-    private bool _attacking, _detected, _damaged;
+    private float Hp = 50f, CurrentHp;
+
+    private float detectTimer = 0f, combotimer = 0f, attackId, combo;
+    private bool _attacking, _detected, _damaged, attacking;
+    private Collider _archerCollider;
 
     public Transform Player => _player;
     public bool Attacking => _attacking;
@@ -21,6 +25,9 @@ public class archerStatehandler : MonoBehaviour
     }
     private void Awake()
     {
+        CurrentHp = Hp;
+        _archerCollider = GetComponent<Collider>();
+
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p == null)
         {
@@ -28,7 +35,16 @@ public class archerStatehandler : MonoBehaviour
             return;
         }
 
+        GameObject sword = GameObject.FindGameObjectWithTag("sword");
+        if(sword == null)
+        {
+            Debug.Log("오브젝트 탐색 실패");
+            return;
+        }
+
+        sword1 = sword.GetComponent<W_Sword>();
         _player = p.transform;
+        attackId = 0;
     }
 
     private void Update()
@@ -42,6 +58,24 @@ public class archerStatehandler : MonoBehaviour
 
             ar.Animator.SetFloat("shoot", current);
         }
+
+        if(CurrentHp != Hp)
+        {
+            Debug.Log(CurrentHp);
+            if(CurrentHp <= 0f)
+            {
+                Destroy(gameObject);
+            }
+            Hp = CurrentHp;
+            Checkdamaged(); 
+            _damaged = false;
+        }
+
+        if(attacking)
+        {
+            combotimer += Time.deltaTime;
+        }
+        
     }
 
     private void CheckArea()
@@ -116,6 +150,48 @@ public class archerStatehandler : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("sword") && sword1._isAttacking)
+        {
+
+            if (combotimer >= 2f)
+            {
+                attacking = false;
+                combo = 0;
+            }
+
+            if(combo == 0)
+            {
+                attacking = true;
+                CurrentHp -= 10f;
+                combo++;
+                combotimer = 0f;
+            }
+            else if(combo == 1)
+            {
+                CurrentHp -= 15f;
+                combo++;
+                combotimer = 0f;
+            }
+            else if(combo == 2)
+            {
+                CurrentHp -= 25f;
+                combo = 0;
+                attacking = false;
+                combotimer = 0f;
+            }
+        }
+        if(other.CompareTag("arrow"))
+        {
+            CurrentHp -= 10f;
+        }
+
+        if(other.CompareTag("bomb"))
+        {
+            CurrentHp -= 30;
+        }
+    }
     public void Checkdamaged()
     {
         _damaged = true;
@@ -126,10 +202,6 @@ public class archerStatehandler : MonoBehaviour
         _attacking = false;
     }
 
-    public void timerReset()
-    {
-        timer = 0f;
-    }
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1f, 1f, 1f, 0.1f);

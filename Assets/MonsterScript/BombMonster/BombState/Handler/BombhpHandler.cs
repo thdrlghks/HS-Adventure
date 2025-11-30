@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class BombhpHandler : MonoBehaviour
 {
+    [SerializeField] private ArmHitBox _Explosion;
+
     private BombMan _bomb;
     private float _bombHP = 5f, _currentHp, _damageTimer, cooltime;
     private bool _damaged, _attacked, _exploed;
     private Collider[] childColliders;
-    private Collider _bombCollider, _monsterCollider; 
-
+    private Collider _bombCollider, _monsterCollider;
+    private P_Player _player;
     public Collider BombCollider => _bombCollider;
     public bool Damaged => _damaged;
 
@@ -19,7 +21,8 @@ public class BombhpHandler : MonoBehaviour
 
     private void Awake()
     {
-        childColliders = GetComponentsInChildren<Collider>();
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        _player = p.GetComponent<P_Player>();
 
         foreach (var col in childColliders)
         {
@@ -53,11 +56,6 @@ public class BombhpHandler : MonoBehaviour
         _bomb.Animator.SetBool("walk", false);
         _bomb.Animator.SetTrigger("damage");
 
-        if(_monsterCollider.CompareTag("sword"))
-        {
-            _bombHP = _bombHP - damage;
-        }
-
         _damageTimer += Time.deltaTime;
 
         if (_damageTimer >= 2f)
@@ -79,13 +77,14 @@ public class BombhpHandler : MonoBehaviour
         _exploed = true;
     }
 
-    public void Attack(Collider collider,float damage)
+    public void Attack(Collider collider,int damage)
     {
+        _Explosion.active = true;
         if (cooltime > 0) return;
         
         if(collider.CompareTag("Player"))
         {
-            // 플레이어 hp 로직 삽입
+            _player.TakeDamage(damage);
             cooltime = 2f;
         }
     }

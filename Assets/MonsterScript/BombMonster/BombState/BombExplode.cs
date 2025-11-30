@@ -16,7 +16,7 @@ public class BombExplode : State<BombMan>
         Timer += Time.deltaTime;
         if(Timer > 0.5f)
         {
-            bombman.BombhpHandler.Attack(bombman.BombhpHandler.BombCollider, 30f);
+            bombman.BombhpHandler.Attack(bombman.BombhpHandler.BombCollider, 30);
         }
 
         if (Timer > 2f)

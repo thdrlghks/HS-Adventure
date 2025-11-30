@@ -12,7 +12,9 @@ public class W_Sword : W_Base
 
     private readonly string[] comboTriggers = { "Attack1", "Attack2", "Attack3" };
 
+    public bool _isAttacking => isAttacking;
     public GameObject myShieldObject;
+
 
     [Header("Combo Timing Settings")]
     // 1. 공격 발생 후 이 시간까지는 구르기 불가 (예약만 됨)

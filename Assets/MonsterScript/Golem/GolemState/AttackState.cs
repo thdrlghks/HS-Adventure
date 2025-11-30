@@ -48,6 +48,6 @@ public class AttackState : State<Golem>
 
     public override void Exit(Golem gol)
     {
-
+        gol.golemAttackHandler.Reset();
     }
 }
