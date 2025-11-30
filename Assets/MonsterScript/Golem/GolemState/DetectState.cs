@@ -9,6 +9,7 @@ public class DetectState : State<Golem>
         gol.Agent.speed = 5f;
         gol.Animator.SetBool("Detect", true);
         gol.Animator.SetFloat("move", 0.5f);
+        gol.Animator.Play("Detect", 0, 0f);
     }
 
     public override void Execute(Golem gol)

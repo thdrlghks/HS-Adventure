@@ -41,7 +41,17 @@ public class GolemAttackHandler : MonoBehaviour
 
     private void Update()
     {
-        
+        if (_damaged)
+        {
+            _damageTimer += Time.deltaTime;
+        }
+
+
+        if (_damageTimer >= 2f)
+        {
+            _damaged = false;
+            _damageTimer = 0;
+        }
     }
 
     public void isDamaged(float damage)
@@ -52,18 +62,6 @@ public class GolemAttackHandler : MonoBehaviour
         {
             _golemHP = _golemHP - damage;
             _damaged = true;
-        }
-
-        if(_damaged)
-        {
-            _damageTimer += Time.deltaTime;
-        }
-        
-
-        if (_damageTimer >= 2f)
-        {
-            _damaged = false;
-            _damageTimer = 0;
         }
     }
     

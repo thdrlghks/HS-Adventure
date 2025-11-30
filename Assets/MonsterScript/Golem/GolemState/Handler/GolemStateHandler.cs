@@ -55,6 +55,24 @@ public class GolemStateHandler : MonoBehaviour
 
         Collider[] detect = Physics.OverlapSphere(transform.position, detectRadius, playerMask);
 
+        if (_attacking)
+        {
+            timer += Time.deltaTime;
+            if (timer >= 5f)
+            {
+                _attacking = false;
+                if (detect.Length == 0 && _detected == false)
+                {
+                    gol.ChangeActionState(GolemAction.Wander);
+                }
+                else
+                {
+                    gol.ChangeActionState(GolemAction.Detect);
+                }
+                timer = 0f;
+            }
+        }
+
         if (detect.Length == 0)
         {
             if (_detected == true)
@@ -74,24 +92,6 @@ public class GolemStateHandler : MonoBehaviour
             gol.ChangeActionState(GolemAction.Attack);
             _attacking = true;
 
-        }
-
-        if(_attacking)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 5f)
-            {
-                _attacking = false;
-                if (detect.Length == 0 && _detected == false)
-                {
-                    gol.ChangeActionState(GolemAction.Wander);
-                }
-                else
-                {
-                    gol.ChangeActionState(GolemAction.Detect);
-                }
-                timer = 0f;
-            }
         }
 
         Vector3 dir = (_player.position - transform.position).normalized;
