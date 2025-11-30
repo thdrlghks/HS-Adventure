@@ -51,11 +51,14 @@ public class P_Move : MonoBehaviour
     public float invincibilityDuration = 0.4f; // 무적 지속 시간 (구르기 시간보다 짧거나 같게)
     public bool IsInvincible { get; private set; } = false;
 
+    private P_Player playerStats; // 참조 변수 추가
+    public float rollStaminaCost = 20f; // 구르기 비용
     void Start()
     {
         controller = GetComponent<CharacterController>();
         attack = GetComponent<P_Attack>();
         //originalHeight = controller.height;
+        playerStats = GetComponent<P_Player>();
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
@@ -194,7 +197,10 @@ public class P_Move : MonoBehaviour
     public void StartRoll(Vector3 dir)
     {
         if (isRolling) return;
-        StartCoroutine(RollRoutine(dir));
+        if (playerStats.UseStamina(rollStaminaCost))
+        {
+            StartCoroutine(RollRoutine(dir));
+        }
     }
 
     IEnumerator RollRoutine(Vector3 dir)

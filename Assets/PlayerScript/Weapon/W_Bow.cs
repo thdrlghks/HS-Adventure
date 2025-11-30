@@ -3,6 +3,8 @@ using System.Collections;
 
 public class W_Bow : W_Base
 {
+    public float chargeStaminaCost = 15f;
+
     [Header("Bow Settings")]
     public GameObject arrowPrefab;
     public Transform firePoint;
@@ -104,11 +106,13 @@ public class W_Bow : W_Base
 
         if (isCharging)
         {
-            if (Input.GetMouseButton(0))
+            bool hasStamina = playerStats.UseStaminaContinuous(chargeStaminaCost);
+
+            if (Input.GetMouseButton(0) && hasStamina)
             {
                 currentChargeTime += Time.deltaTime;
             }
-            else if (Input.GetMouseButtonUp(0))
+            else if (Input.GetMouseButtonUp(0) || !hasStamina)
             {
                 StartCoroutine(FireProcess());
                 isCharging = false;

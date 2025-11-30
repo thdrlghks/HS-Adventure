@@ -3,12 +3,16 @@ using System.Collections;
 
 public class W_Sword : W_Base
 {
+    public float shieldStaminaCost = 5f;
+
     private int comboIndex = 0;
     private bool isAttacking = false;
     private bool comboQueued = false;
     private bool rollQueued = false;
 
     private readonly string[] comboTriggers = { "Attack1", "Attack2", "Attack3" };
+
+    public GameObject myShieldObject;
 
     [Header("Combo Timing Settings")]
     // 1. 공격 발생 후 이 시간까지는 구르기 불가 (예약만 됨)
@@ -42,6 +46,18 @@ public class W_Sword : W_Base
     private Vector3 debugHitPos;
     private float debugHitRadius;
     private bool showDebugHit = false;
+
+    public override void OnEquip()
+    {
+        base.OnEquip(); // 애니메이터 교체
+        if (myShieldObject != null) myShieldObject.SetActive(true); // 방패 켜기
+    }
+
+    public override void OnUnequip()
+    {
+        base.OnUnequip();
+        if (myShieldObject != null) myShieldObject.SetActive(false); // 방패 끄기
+    }
 
     // --------------------------------------------------------
     // [1] 공격 입력 처리
@@ -267,8 +283,19 @@ public class W_Sword : W_Base
         if (!controller.isGrounded || isAttacking) return;
         if (Input.GetMouseButton(1))
         {
-            animator.SetBool("Shield", true);
-            StopImmediately();
+            bool hasStamina = playerStats.UseStaminaContinuous(shieldStaminaCost);
+
+            if (hasStamina && !IsShielding)
+            {
+                animator.SetBool("Shield", true);
+                StopImmediately();
+            }
+            // 스테미너가 다 떨어지면 -> 강제 해제
+            else if (!hasStamina && IsShielding)
+            {
+                animator.SetBool("Shield", false);
+            }
+
             if (RollInput(out Vector3 dir))
             {
                 animator.SetBool("Shield", false);

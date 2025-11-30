@@ -56,7 +56,7 @@ public class P_Bomb : MonoBehaviour
             if (nearbyObject.CompareTag("Enemy"))
             {
                 // 적에게 데미지 주기 (예시)
-                Debug.Log(nearbyObject.name + " 폭발 휘말림!");
+                Debug.Log(nearbyObject.name + " 폭발 휘말림! " + damage + "의 데미지");
                 // nearbyObject.GetComponent<Enemy>().TakeDamage(damage);
             }
 
