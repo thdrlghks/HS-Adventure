@@ -15,6 +15,7 @@ public class AttackState : State<Golem>
             case 1: gol.Animator.SetTrigger("Attack2"); break;
             case 2: gol.Animator.SetTrigger("Attack3"); break;
         }
+        gol.Animator.Play("AttackMode", 0, 0f);
     }
 
     public override void Execute(Golem gol)
@@ -34,6 +35,7 @@ public class AttackState : State<Golem>
         }
 
         gol.golemAttackHandler.Attack(_attackmode, 10f);
+
     }
 
     public override void FixedExecute(Golem gol)

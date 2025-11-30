@@ -3,7 +3,7 @@ using UnityEngine.AI;
 
 public class Area : MonoBehaviour
 {
-    private float Radius = 20f;
+    public float Radius = 20f;
 
     private void OnDrawGizmosSelected()
     {
