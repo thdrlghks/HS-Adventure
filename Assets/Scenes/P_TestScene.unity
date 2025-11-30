@@ -755,6 +755,7 @@ MonoBehaviour:
   climbCheckDistance: 1
   climbHeightOffset: 1.2
   climbSpeed: 3
+  climbCooldown: 1
   cameraTransform: {fileID: 436072752}
   animator: {fileID: 0}
   isRolling: 0
@@ -8658,7 +8659,20 @@ MonoBehaviour:
   - 1.2
   - 2.6
   - 2.7
+  comboRecoveryTimes:
+  - 0.2
+  - 0.4
+  - 1
   comboDamages: 0a0000000f00000019000000
+  attackRange: 1
+  attackRadius: 1
+  hitDelays:
+  - 0.25
+  - 0.59
+  - 0.9
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
   shieldGuardRate: 0.7
 --- !u!4 &4112990893880066419
 Transform:

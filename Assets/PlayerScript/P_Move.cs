@@ -30,6 +30,9 @@ public class P_Move : MonoBehaviour
     public float climbSpeed = 3f;           // 올라가는 속도
     private bool isClimbing = false;
 
+    public float climbCooldown = 1.0f; // 등반 후 1초간 재등반 금지
+    private float lastClimbTime = -10f; // 마지막 등반 시간
+
     [Header("카메라 참조")]
     public Transform cameraTransform;
 
@@ -94,7 +97,11 @@ public class P_Move : MonoBehaviour
         // 점프 중에만 등반 체크 (혹은 떨어지는 중에도 가능하게 하려면 verticalVelocity 조건 조절)
         if (!controller.isGrounded && !isRolling)
         {
-            CheckForLedge();
+            if (Time.time > lastClimbTime + climbCooldown)
+            {
+                CheckForLedge();
+                if (isClimbing) return;
+            }
         }
 
         //HandleCrouch();
@@ -137,6 +144,8 @@ public class P_Move : MonoBehaviour
         isJumping = false; // 점프 상태 초기화
         canMove = false;
 
+        lastClimbTime = Time.time;
+
         // 애니메이션 재생
         animator.SetTrigger("Climb");
 
@@ -173,6 +182,7 @@ public class P_Move : MonoBehaviour
 
         // 종료 처리
         controller.enabled = true; // 컨트롤러 다시 켜기
+        lastClimbTime = Time.time;
         isClimbing = false;
         canMove = true;
         verticalVelocity = 0f; // 낙하 가속도 초기화
@@ -389,7 +399,11 @@ public class P_Move : MonoBehaviour
 
         Vector3 velocity = inputDir * currentSpeed;
         velocity.y = verticalVelocity;
-        controller.Move(velocity * Time.deltaTime);
+
+        if(controller.enabled)
+        {
+            controller.Move(velocity * Time.deltaTime);
+        }
 
         // 회전
         if (isMoving)
