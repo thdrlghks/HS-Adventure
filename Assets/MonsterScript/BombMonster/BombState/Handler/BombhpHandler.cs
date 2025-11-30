@@ -4,7 +4,7 @@ using UnityEngine;
 public class BombhpHandler : MonoBehaviour
 {
     [SerializeField] private ArmHitBox _Explosion;
-
+   
     private BombMan _bomb;
     private float _bombHP = 5f, _currentHp, _damageTimer, cooltime;
     private bool _damaged, _attacked, _exploed;
@@ -23,18 +23,6 @@ public class BombhpHandler : MonoBehaviour
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         _player = p.GetComponent<P_Player>();
-
-        foreach (var col in childColliders)
-        {
-            if (col.name == "explodeCollider")
-            {
-                _bombCollider = col;
-            }
-            else if(col.name == "monsterCollider")
-            {
-                _monsterCollider = col;
-            }
-        }
 
         cooltime = 0f;
     }
