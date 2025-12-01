@@ -69,11 +69,14 @@ public class P_Move : MonoBehaviour
 
     void Update()
     {
+        if (GameStarter.isGameRunning == false) return;
+        /*
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         } // 임시
+        */
 
         if (!canMove)
         {

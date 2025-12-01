@@ -18,6 +18,8 @@ public class P_Player : MonoBehaviour
     private float lastHitTime = 0f;
     public float hitCooldown = 1f;
 
+    private bool isDead = false;
+
     private CharacterController controller;
 
     private P_Attack attackSystem;
@@ -98,6 +100,7 @@ public class P_Player : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (isDead) return;
         if (moveSystem != null && moveSystem.IsInvincible)
         {
             Debug.Log("회피 무적! 데미지 무시됨");
@@ -118,8 +121,31 @@ public class P_Player : MonoBehaviour
 
         if (currentHP <= 0)
         {
-            // 사망 처리 (필요시 추가)
-            // Die(); 
+            Die(); 
+        }
+    }
+    void Die()
+    {
+        isDead = true;
+        Debug.Log("플레이어 사망!");
+
+        // 1. 더 이상 움직이거나 공격하지 못하게 컴포넌트 비활성화
+        if (moveSystem != null) moveSystem.enabled = false;
+        if (attackSystem != null) attackSystem.enabled = false;
+        controller.enabled = false; // 물리 충돌 및 이동 정지
+
+        // (선택사항) 사망 애니메이션 실행
+        // Animator anim = GetComponentInChildren<Animator>();
+        // if(anim != null) anim.SetTrigger("Die");
+
+        // 2. 마우스 커서 보이게 하기 (버튼 클릭을 위해)
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        // 3. UI 패널 띄우기
+        if (ui != null)
+        {
+            ui.ShowDeathPanel();
         }
     }
 }
