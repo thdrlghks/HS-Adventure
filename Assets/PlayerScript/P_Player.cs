@@ -3,6 +3,11 @@
 [RequireComponent(typeof(CharacterController))]
 public class P_Player : MonoBehaviour
 {
+    private CharacterController controller;
+    public P_UI ui;
+    private P_Attack attackSystem;
+    private P_Move moveSystem;
+
     [Header("Health Settings")]
     public int maxHP = 200;
     public int currentHP;
@@ -10,31 +15,24 @@ public class P_Player : MonoBehaviour
     [Header("Stamina Settings")]
     public float maxStamina = 100f;
     public float currentStamina;
-    public float staminaRegenRate = 15f;   // 초당 회복량
+    public float staminaRegenRate = 15f; // 초당 회복량
     public float staminaRegenDelay = 2.0f; // 행동 후 회복 대기 시간
     private float lastStaminaUseTime;
 
-    public P_UI ui;
     private float lastHitTime = 0f;
     public float hitCooldown = 1f;
 
     private bool isDead = false;
 
-    private CharacterController controller;
-
-    private P_Attack attackSystem;
-    private P_Move moveSystem;
-
     void Start()
     {
         controller = GetComponent<CharacterController>();
-
         attackSystem = GetComponent<P_Attack>();
         moveSystem = GetComponent<P_Move>();
 
+        // 초기화
         currentHP = maxHP;
         currentStamina = maxStamina;
-
         ui.UpdateHealth(currentHP, maxHP);
         ui.UpdateStamina(currentStamina, maxStamina);
     }
@@ -50,15 +48,15 @@ public class P_Player : MonoBehaviour
             currentStamina -= amount;
             lastStaminaUseTime = Time.time;
             ui.UpdateStamina(currentStamina, maxStamina); 
-            return true; // 사용 성공
+            return true; // 성공
         }
 
         Debug.Log("스테미너 부족!");
-        return false; // 사용 실패
+        return false; // 실패
     }
 
     // ---------------------------------------------------------
-    // 🔥 [핵심 2] 스테미너 지속 소모 (방패, 활 조준용)
+    // 스테미너 지속 소모 (방패, 활 조준용)
     // ---------------------------------------------------------
     public bool UseStaminaContinuous(float amountPerSec)
     {
@@ -72,12 +70,12 @@ public class P_Player : MonoBehaviour
 
             return true;
         }
-        return false; // 스테미너 0 됨
+        return false; // 스테미너 부족
     }
 
     void HandleStaminaRegen()
     {
-        // 마지막 사용 후 딜레이가 지났고, 꽉 차있지 않다면 회복
+        // 미사용 시 딜레이 이후 회복
         if (Time.time > lastStaminaUseTime + staminaRegenDelay && currentStamina < maxStamina)
         {
             currentStamina += staminaRegenRate * Time.deltaTime;
@@ -100,15 +98,16 @@ public class P_Player : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if (isDead) return;
-        if (moveSystem != null && moveSystem.IsInvincible)
+        if (isDead) return; // 죽음
+
+        if (moveSystem != null && moveSystem.IsInvincible) // 회피
         {
             Debug.Log("회피 무적! 데미지 무시됨");
             return;
         }
         float reduction = 0f;
 
-        if (attackSystem != null && attackSystem.currentWeapon != null)
+        if (attackSystem != null && attackSystem.currentWeapon != null) // 실드
         {
             reduction = attackSystem.currentWeapon.GetDamageReductionRate();
         }
@@ -129,20 +128,14 @@ public class P_Player : MonoBehaviour
         isDead = true;
         Debug.Log("플레이어 사망!");
 
-        // 1. 더 이상 움직이거나 공격하지 못하게 컴포넌트 비활성화
         if (moveSystem != null) moveSystem.enabled = false;
         if (attackSystem != null) attackSystem.enabled = false;
         controller.enabled = false; // 물리 충돌 및 이동 정지
 
-        // (선택사항) 사망 애니메이션 실행
-        // Animator anim = GetComponentInChildren<Animator>();
-        // if(anim != null) anim.SetTrigger("Die");
-
-        // 2. 마우스 커서 보이게 하기 (버튼 클릭을 위해)
+        // 커서 보이게 하기
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        // 3. UI 패널 띄우기
         if (ui != null)
         {
             ui.ShowDeathPanel();

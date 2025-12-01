@@ -17,14 +17,8 @@ public class W_Sword : W_Base
 
 
     [Header("Combo Timing Settings")]
-    // 1. 공격 발생 후 이 시간까지는 구르기 불가 (예약만 됨)
     public float[] comboMinTimes = { 0.6f, 1.0f, 1.3f };
-
-    // 2. 애니메이션 전체 길이
     public float[] comboDurations = { 1.2f, 2.6f, 2.7f };
-
-    // 3. 🔥 [추가] 애니메이션 끝자락의 '조작 불가' 후딜레이 시간
-    // 값이 클수록 공격 후 멍때리는 시간이 길어져 난이도가 올라감
     public float[] comboRecoveryTimes = { 0.2f, 0.4f, 1.0f };
 
     public int[] comboDamages = { 10, 15, 25 };
@@ -51,18 +45,18 @@ public class W_Sword : W_Base
 
     public override void OnEquip()
     {
-        base.OnEquip(); // 애니메이터 교체
-        if (myShieldObject != null) myShieldObject.SetActive(true); // 방패 켜기
+        base.OnEquip();
+        if (myShieldObject != null) myShieldObject.SetActive(true);
     }
 
     public override void OnUnequip()
     {
         base.OnUnequip();
-        if (myShieldObject != null) myShieldObject.SetActive(false); // 방패 끄기
+        if (myShieldObject != null) myShieldObject.SetActive(false);
     }
 
     // --------------------------------------------------------
-    // [1] 공격 입력 처리
+    // 공격 입력 처리
     // --------------------------------------------------------
     public override void Attack()
     {
@@ -73,7 +67,7 @@ public class W_Sword : W_Base
         if (isAttacking)
         {
             if (comboIndex >= comboTriggers.Length - 1) return;
-            comboQueued = true; // 언제든 선입력은 받음 (단, 실행은 코루틴이 결정)
+            comboQueued = true; // 선입력
         }
         else
         {
@@ -97,7 +91,7 @@ public class W_Sword : W_Base
     }
 
     // --------------------------------------------------------
-    // [2] 공격 실행 코루틴 (3단계 구간 적용)
+    // 공격 실행 코루틴 (3단계 구간 적용)
     // --------------------------------------------------------
     IEnumerator DoAttack()
     {
@@ -170,15 +164,8 @@ public class W_Sword : W_Base
         // 특징: 키 입력 완전 무시 (패널티 시간)
         // =================================================================
 
-        // 시각적 힌트를 위해 필요하다면 여기서 검 색깔을 바꾸거나 효과를 줄 수 있음
-
         while (timer < duration)
         {
-            // 🔥 여기서는 RollInput이나 comboQueued를 체크하지 않음!
-            // 즉, 아무리 키를 눌러도 캐릭터는 멍하니 서 있어야 함.
-
-            // (선택사항) 여기서 입력하면 "틱" 소리 같은 걸 내서 '안 눌린다'는 피드백을 줄 수도 있음.
-
             timer += Time.deltaTime;
             yield return null;
         }
@@ -190,9 +177,6 @@ public class W_Sword : W_Base
         comboQueued = false;
     }
 
-    // --------------------------------------------------------
-    // [3] 기타 함수들
-    // --------------------------------------------------------
     void CancelAttackAndRoll(Vector3 dir)
     {
         StopImmediately();
@@ -210,10 +194,8 @@ public class W_Sword : W_Base
         comboIndex = 0;
     }
 
-    // ... (나머지 CheckHit, Gizmos, RollInput 등은 기존 유지) ...
     void CheckHit()
     {
-        // 1. 공격 위치 계산
         Vector3 attackPos = transform.position + transform.forward * attackRange;
 
         // 디버깅용 정보 저장 (Gizmo에서 그리기 위함)
@@ -223,7 +205,7 @@ public class W_Sword : W_Base
         // 0.5초 뒤에 디버그 그림 끄기
         Invoke("DisableDebugView", 0.5f);
 
-        // 2. 범위 내 적 검출
+        // 2. 범위 내 적
         Collider[] enemies = Physics.OverlapSphere(attackPos, attackRadius, enemyLayer);
 
         if (enemies.Length == 0)
@@ -236,36 +218,22 @@ public class W_Sword : W_Base
             if (enemy.CompareTag("Enemy"))
             {
                 Debug.Log($"🎯 적중! : {enemy.name}");
-                // 데미지 처리...
-            }
-            else
-            {
-                Debug.Log($"⚠️ 범위엔 들어왔는데 태그가 Enemy가 아님: {enemy.name} (현재 태그: {enemy.tag})");
             }
         }
     }
 
     void OnDrawGizmos()
-    {
-        // 평소 설정값 미리보기 (흰색)
+    { // 디버그용
         Gizmos.color = Color.white;
         Vector3 previewPos = transform.position + transform.forward * attackRange;
         Gizmos.DrawWireSphere(previewPos, attackRadius);
 
-        // 🔥 공격 순간 실제로 때린 위치 (빨간색 - 채워진 원)
         if (showDebugHit)
         {
-            Gizmos.color = new Color(1, 0, 0, 0.5f); // 반투명 빨강
+            Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.DrawSphere(debugHitPos, debugHitRadius);
         }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Vector3 attackPos = transform.position + transform.forward * attackRange;
-        Gizmos.DrawWireSphere(attackPos, attackRadius);
-    }
+    } 
 
     bool RollInput(out Vector3 dir)
     {

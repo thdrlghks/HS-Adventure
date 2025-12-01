@@ -13,7 +13,7 @@ public class W_Bow : W_Base
     [Header("Charging Settings")]
     public float minForce = 15f;
     public float maxForce = 40f;
-    public float maxChargeTime = 2.0f;
+    public float maxChargeTime = 1.0f;
 
     [Header("Cooldown Settings")]
     public float attackCooldown = 1.0f;
@@ -22,9 +22,8 @@ public class W_Bow : W_Base
     private float currentChargeTime = 0f;
     private bool isCharging = false;
 
-    public float aimRotationSpeed = 20f; // 회전 속도 약간 올림
+    public float aimRotationSpeed = 20f;
 
-    // 원래 쉴드 속도를 기억했다가 되돌리기 위한 변수 (선택사항)
     private float originalShieldSpeed;
 
     public override bool IsShielding => animator.GetBool("Shield");
@@ -32,22 +31,17 @@ public class W_Bow : W_Base
     public override bool CanMoveWhileAiming => false;
     public override void Attack() { }
 
-    // 🔥 [추가] 시작할 때 P_Move 설정을 활 전용으로 변경
     void Start()
     {
-        // P_Move 컴포넌트가 있다면
         if (move != null)
         {
-            // 원래 쉴드 속도 저장 (나중에 필요할 수 있으니)
+            // 원래 쉴드 속도 저장
             originalShieldSpeed = move.shieldSpeed;
-
-            // 🔥 [핵심 1] 조준(Shield) 중 이동 속도를 0으로 강제 설정
-            // 이러면 P_Move 스크립트를 안 고쳐도, 활을 들면 조준 시 못 움직입니다.
+            // 조준 시 속도 0
             move.shieldSpeed = 0f;
         }
     }
 
-    // (옵션) 활을 집어넣을 때(파괴되거나 비활성될 때) 속도 복구
     void OnDisable()
     {
         if (move != null)
@@ -62,10 +56,6 @@ public class W_Bow : W_Base
         HandleShooting();
     }
 
-    // 🔥 [핵심 2] 회전 로직을 Update가 아닌 LateUpdate로 이동
-    // 이유: P_Move가 Update에서 WASD 방향으로 회전을 시도하는데,
-    // 여기서도 Update로 돌리면 서로 싸워서 캐릭터가 덜덜 떨림.
-    // LateUpdate에서 마지막으로 덮어씌워야 카메라 방향을 완벽하게 봅니다.
     void LateUpdate()
     {
         if (IsShielding)
@@ -83,10 +73,8 @@ public class W_Bow : W_Base
         }
         else
         {
-            // 우클릭을 뗐거나 || 공중에 떴다면 조준 해제
             animator.SetBool("Shield", false);
 
-            // 조준이 풀리면 차징도 취소
             isCharging = false;
             currentChargeTime = 0f;
         }
@@ -133,7 +121,7 @@ public class W_Bow : W_Base
         if (arrowPrefab != null && firePoint != null)
         {
             GameObject arrowObj = Instantiate(arrowPrefab, firePoint.position, firePoint.rotation);
-            P_Arrow arrowScript = arrowObj.GetComponent<P_Arrow>(); // P_Arrow인지 P_Projectile인지 이름 확인!
+            P_Arrow arrowScript = arrowObj.GetComponent<P_Arrow>();
 
             if (arrowScript != null)
             {
@@ -146,7 +134,7 @@ public class W_Bow : W_Base
     }
 
     void RotatePlayerToCamera()
-    {
+    { // 카메라를 따라 플레이어 회전
         if (Camera.main == null) return;
 
         Vector3 camForward = Camera.main.transform.forward;
@@ -156,8 +144,6 @@ public class W_Bow : W_Base
         if (camForward.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(camForward);
-            // LateUpdate에서는 Time.deltaTime을 써도 되고, 더 즉각적인 반응을 원하면 보간 없이 바로 넣어도 됨
-            // 여기서는 부드럽게 유지
             owner.transform.rotation = Quaternion.Slerp(owner.transform.rotation, targetRotation, Time.deltaTime * aimRotationSpeed);
         }
     }

@@ -1489,29 +1489,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 335490574348921113, guid: dcad27cc5107e6b4a83b63ca765f1ce1, type: 3}
   m_PrefabInstance: {fileID: 2067339868}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1058628699 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5144278670838236381, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
-  m_PrefabInstance: {fileID: 1850193104}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1058628705
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1058628699}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 747aa413905676144b18b9104253d7c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraObstructionFader
-  playerTarget: {fileID: 1898633265}
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 63
-  fadeSpeed: 5
-  targetAlpha: 0.2
 --- !u!1001 &1082977340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2729,13 +2706,17 @@ PrefabInstance:
       propertyPath: minForce
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1123987766989754616, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
+      propertyPath: maxChargeTime
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2831545392478701592, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 25.604443
       objectReference: {fileID: 0}
     - target: {fileID: 2831545392478701592, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.36
+      value: 1.41
       objectReference: {fileID: 0}
     - target: {fileID: 2831545392478701592, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2777,6 +2758,18 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 4620378625508905602, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620378625508905602, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620378625508905602, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7549868114801176389, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
       propertyPath: m_TagString
       value: sword
@@ -2788,16 +2781,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5144278670838236381, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1058628705}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
---- !u!4 &1898633265 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3768757947418204592, guid: 513136940053a7c4ca2049ff249b7b5b, type: 3}
-  m_PrefabInstance: {fileID: 1850193104}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1915653958
 PrefabInstance:
   m_ObjectHideFlags: 0

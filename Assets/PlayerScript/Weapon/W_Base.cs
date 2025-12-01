@@ -20,7 +20,7 @@ public abstract class W_Base : MonoBehaviour
 
         if (weaponOverride != null && animator != null)
         {
-            // 현재 애니메이터의 상태(걷는 중 등)를 유지하며 클립만 교체
+            // 클립 교체
             animator.runtimeAnimatorController = weaponOverride;
         }
 
@@ -40,9 +40,9 @@ public abstract class W_Base : MonoBehaviour
     }
     public virtual void OnEquip()
     {
-        // 1. 애니메이션 컨트롤러 교체
         if (weaponOverride != null && animator != null)
         {
+            // 클립 교체
             animator.runtimeAnimatorController = weaponOverride;
         }
     }

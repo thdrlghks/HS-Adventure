@@ -14911,7 +14911,7 @@ MonoBehaviour:
   explosionDelay: 3
   explosionRadius: 3
   damage: 30
-  explosionEffect: {fileID: 0}
+  explosionEffect: {fileID: 840797125908922835}
   targetLayer:
     serializedVersion: 2
     m_Bits: 128

@@ -3,7 +3,7 @@
 public class P_Camara : MonoBehaviour
 {
     [Header("기본 설정")]
-    public Transform cameraPivot;        // 카메라 중심 (플레이어 머리 근처)
+    public Transform cameraPivot;        // 카메라 중심
     public float mouseSensitivity = 3f;  // 마우스 감도
     public float distance = 4f;          // 기본 거리
     public float minDistance = 1.2f;     // 최소 거리
@@ -30,7 +30,7 @@ public class P_Camara : MonoBehaviour
         targetDistance = distance;
         currentDistance = distance;
         if (cameraPivot == null)
-            Debug.LogWarning("⚠️ TPS_Camera: cameraPivot을 지정하세요!");
+            Debug.LogWarning("cameraPivot 지정 요");
     }
 
     void LateUpdate()
@@ -46,8 +46,6 @@ public class P_Camara : MonoBehaviour
 
     void FollowPlayerPositionOnly()
     {
-        // 플레이어 스켈레톤의 위치를 가져옴
-        // cameraPivot 의 부모가 PlayerSkel 이 아님. 독립 오브젝트여야 함.
         Transform player = cameraPivot.parent;
 
         if (player != null)
@@ -71,7 +69,6 @@ public class P_Camara : MonoBehaviour
 
     void HandleZoom()
     {
-        // 🌀 마우스 휠 입력
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (Mathf.Abs(scroll) > 0.01f)
         {
@@ -100,7 +97,7 @@ public class P_Camara : MonoBehaviour
             currentDistance = Mathf.Lerp(currentDistance, distance, Time.deltaTime * 5f);
         }
 
-        // 최종 카메라 위치
+        // 최종 카메라 수정
         Vector3 finalPos = cameraPivot.position - cameraPivot.forward * currentDistance;
         transform.position = Vector3.Lerp(transform.position, finalPos, Time.deltaTime * smoothSpeed);
 

@@ -18,13 +18,13 @@ public class P_Move : MonoBehaviour
     private bool isJumping = false;
     [Header("점프 물리 보정")]
     public float jumpUpMultiplier = 0.8f;      // 상승 중 중력 보정
-    public float fallMultiplier = 2.5f;        // 하강 가속도 (더 무거워짐)
+    public float fallMultiplier = 2.5f;        // 하강 가속도
     public float lowJumpMultiplier = 3.0f;     // 점프키 떼면 더 빨리 떨어짐
     private bool wasGroundedLastFrame = true;
     private float jumpTime = 0f;
 
     [Header("파쿠르(등반) 설정")]
-    public LayerMask climbLayer;        // 등반 가능한 레이어 (Wall, Ground 등)
+    public LayerMask climbLayer;        // 등반 가능한 레이어
     public float climbCheckDistance = 1.0f; // 벽 감지 거리
     public float climbHeightOffset = 1.2f;  // 머리 위에서 아래로 쏠 레이의 높이
     public float climbSpeed = 3f;           // 올라가는 속도
@@ -48,16 +48,15 @@ public class P_Move : MonoBehaviour
     public float rollDuration = 0.5f;
 
     [Header("무적 설정")]
-    public float invincibilityDuration = 0.4f; // 무적 지속 시간 (구르기 시간보다 짧거나 같게)
+    public float invincibilityDuration = 0.4f; // 무적 지속 시간
     public bool IsInvincible { get; private set; } = false;
 
     private P_Player playerStats; // 참조 변수 추가
-    public float rollStaminaCost = 20f; // 구르기 비용
+    public float rollStaminaCost = 20f; // 구르기 스테미너 소모량
     void Start()
     {
         controller = GetComponent<CharacterController>();
         attack = GetComponent<P_Attack>();
-        //originalHeight = controller.height;
         playerStats = GetComponent<P_Player>();
 
         if (animator == null)
@@ -100,7 +99,7 @@ public class P_Move : MonoBehaviour
 
         if (isClimbing) return; // 등반 중에는 다른 입력 무시
 
-        // 점프 중에만 등반 체크 (혹은 떨어지는 중에도 가능하게 하려면 verticalVelocity 조건 조절)
+        // 점프 중에만 등반 체크
         if (!controller.isGrounded && !isRolling)
         {
             if (Time.time > lastClimbTime + climbCooldown)
@@ -110,32 +109,27 @@ public class P_Move : MonoBehaviour
             }
         }
 
-        //HandleCrouch();
         HandleMovement();
         HandleJump();
     }
 
     // ----------------------------------------
-    // 파쿠르 감지 로직 (핵심)
+    // 파쿠르 감지 로직
     // ----------------------------------------
     void CheckForLedge()
     {
-        // 1. 앞으로 쏘는 레이 (벽 감지)
         Vector3 rayOrigin = transform.position + Vector3.up * 1.0f; // 가슴 높이
         RaycastHit hitWall;
 
-        // 벽이 앞에 있는지 확인
         if (Physics.Raycast(rayOrigin, transform.forward, out hitWall, climbCheckDistance, climbLayer))
         {
-            // 2. 위에서 아래로 쏘는 레이 (착지 지점 감지)
-            // 벽보다 조금 더 앞(0.5f), 조금 더 위(climbHeightOffset)에서 시작
             Vector3 downRayOrigin = transform.position + Vector3.up * climbHeightOffset + transform.forward * (climbCheckDistance + 0.2f);
             RaycastHit hitLedge;
 
-            // 아래로 쐈을 때 무언가 걸린다면 (평평한 땅이 있다면)
+            // 땅이 있다면.
             if (Physics.Raycast(downRayOrigin, Vector3.down, out hitLedge, climbHeightOffset, climbLayer))
             {
-                // 착지할 곳의 높이가 내 발밑보다는 높아야 함 (바닥 기어가기 방지)
+                // 착지할 곳의 높이가 내 발밑보다는 높아야 함
                 if (hitLedge.point.y > transform.position.y + 0.5f)
                 {
                     StartCoroutine(ClimbLedge(hitWall.point, hitLedge.point));
@@ -151,42 +145,35 @@ public class P_Move : MonoBehaviour
         canMove = false;
 
         lastClimbTime = Time.time;
-
-        // 애니메이션 재생
         animator.SetTrigger("Climb");
 
-        // 물리 연산 끄기 (CharacterController가 켜져 있으면 강제로 위치 이동시킬 때 덜덜거림)
+        // 물리 연산 끄기
         controller.enabled = false;
 
-        // 1단계: 벽에 붙기 & 위로 올라가기
-        // 목표 위치: 턱(Ledge) 높이까지 Y축 이동
+        // 올라가기 관련 POS
         Vector3 startPos = transform.position;
         Vector3 targetPos = new Vector3(transform.position.x, ledgePoint.y, transform.position.z);
 
-        // 약간 벽 쪽으로 붙여줌 (선택 사항)
-        // transform.position = wallPoint - transform.forward * 0.3f; 
-
         float timer = 0f;
-        while (timer < 0.5f) // 0.5초 동안 올라감 (애니메이션 길이에 맞게 조절)
+        while (timer < 0.5f) // 올라가기
         {
             transform.position = Vector3.Lerp(startPos, targetPos, timer / 0.5f);
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // 2단계: 앞으로 이동해서 착지
+        // 앞으로 이동 관련 POS
         startPos = transform.position;
         targetPos = ledgePoint; // 최종 착지 지점
 
         timer = 0f;
-        while (timer < 0.2f) // 0.2초 동안 앞으로 진입
+        while (timer < 0.2f)
         {
             transform.position = Vector3.Lerp(startPos, targetPos, timer / 0.2f);
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // 종료 처리
         controller.enabled = true; // 컨트롤러 다시 켜기
         lastClimbTime = Time.time;
         isClimbing = false;
@@ -227,7 +214,7 @@ public class P_Move : MonoBehaviour
             {
                 IsInvincible = false;
             }
-            // 🔥 중력 적용
+
             if (controller.isGrounded)
             {
                 if (verticalVelocity < 0f)
@@ -235,7 +222,6 @@ public class P_Move : MonoBehaviour
             }
             verticalVelocity += gravity * Time.deltaTime;
 
-            // 🔥 이동 + 중력 통합
             Vector3 velocity = dir * rollSpeed;
             velocity.y = verticalVelocity;
 
@@ -252,7 +238,7 @@ public class P_Move : MonoBehaviour
     IEnumerator RollRecoveryDelay()
     {
         canMove = false;
-        yield return new WaitForSeconds(0.1f);  // 원하는 후딜 시간
+        yield return new WaitForSeconds(0.1f);  // 후딜레이
         canMove = true;
     }
 
@@ -282,9 +268,8 @@ public class P_Move : MonoBehaviour
     // ----------------------------------------
     void HandleJump()
     {
-        //조준 중에 이동 불가능한 무기(활)라면 점프 금지
         if (attack.IsShielding && attack.currentWeapon != null && !attack.currentWeapon.CanMoveWhileAiming)
-        {
+        { // 활은 점프 금지
             return;
         }
 
@@ -295,9 +280,8 @@ public class P_Move : MonoBehaviour
             if (verticalVelocity < 0f)
                 verticalVelocity = -2f;
 
-            if (Input.GetKeyDown(KeyCode.Space) /*&& !isCrouching*/)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                // 현실적인 점프 높이
                 isJumping = true;
                 verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 animator.SetTrigger("Jump");
@@ -309,17 +293,14 @@ public class P_Move : MonoBehaviour
             jumpTime += Time.deltaTime;
         }
 
-        // ✨ 상승 중 (Key 유지 시)
         if (verticalVelocity > 0 && Input.GetKey(KeyCode.Space))
         {
             verticalVelocity += gravity * jumpUpMultiplier * Time.deltaTime;
         }
-        // ✨ Space 떼면 더 빨리 떨어짐 (짧은 점프 가능)
         else if (verticalVelocity > 0 && !Input.GetKey(KeyCode.Space))
         {
             verticalVelocity += gravity * lowJumpMultiplier * Time.deltaTime;
         }
-        // ✨ 하강 중 (중력 강화)
         else if (verticalVelocity < 0)
         {
             verticalVelocity += gravity * fallMultiplier * Time.deltaTime;
@@ -331,15 +312,14 @@ public class P_Move : MonoBehaviour
         if (!wasGroundedLastFrame && isGroundedNow)
         {
             isJumping = false;
-            // 🔥 착지 강도에 따른 조건 분기
             if (jumpTime > 0.7f)
             {
-                animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션
+                animator.SetTrigger("Landing");  // 더 높은 곳에서의 낙하 → 착지 모션
                 StartCoroutine(LandingDelay(0.6f));
             }
             else if (jumpTime > 0.6f)
             {
-                animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션
+                animator.SetTrigger("Landing");  // 높은 낙하 → 착지 모션 ( 스페이스바 최대로 눌렀을 시 높이 )
                 StartCoroutine(LandingDelay(0.2f));
             }
             else
@@ -355,7 +335,7 @@ public class P_Move : MonoBehaviour
     {
         jumpTime = 0f;
         canMove = false;
-        yield return new WaitForSeconds(landingDelayTime);  // 착지 느낌용 텀
+        yield return new WaitForSeconds(landingDelayTime);  // 착지 느낌
         canMove = true;
     }
 
@@ -388,18 +368,16 @@ public class P_Move : MonoBehaviour
 
         if (attack.IsShielding)
         {
-            // 현재 무기가 "조준 중 이동 가능"한 녀석인지 확인
             if (attack.currentWeapon != null && attack.currentWeapon.CanMoveWhileAiming)
             {
-                // 검(Sword) 등: 느리게 이동
                 currentSpeed = shieldSpeed;
             }
             else
             {
-                // 활(Bow) 등: 아예 이동 불가 (속도 0)
                 currentSpeed = 0f;
             }
         }
+
         // 달리기 처리
         else if (Input.GetKey(KeyCode.LeftShift) && isMoving)
         {
@@ -425,11 +403,10 @@ public class P_Move : MonoBehaviour
 
         if (attack.IsShielding)
         {
-            // 이동 가능한 무기만 0.5(걷기) 애니메이션, 아니면 0(멈춤)
             if (attack.currentWeapon != null && attack.currentWeapon.CanMoveWhileAiming)
                 animSpeed = isMoving ? 0.5f : 0f;
             else
-                animSpeed = 0f; // 강제로 멈춤 모션
+                animSpeed = 0f; 
         }
         else
         {
