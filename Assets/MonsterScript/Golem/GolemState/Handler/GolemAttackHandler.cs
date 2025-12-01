@@ -62,7 +62,6 @@ public class GolemAttackHandler : MonoBehaviour
             {
                 Destroy(gameObject);
             }
-            _golemHP = _currrentHp;
             _damaged = false;
         }
 
@@ -85,10 +84,12 @@ public class GolemAttackHandler : MonoBehaviour
             hit2.active = true;
             hit3.active = true;
         }
-        else
+        else if (mode == 2)
         {
-            _currrentHp += 10f;
+            _currrentHp = Mathf.Min(_currrentHp + 10f, _golemHP);
+            return;
         }
+
     }
 
     public void Reset()

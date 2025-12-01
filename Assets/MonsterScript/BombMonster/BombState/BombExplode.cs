@@ -14,10 +14,6 @@ public class BombExplode : State<BombMan>
     public override void Execute(BombMan bombman)
     {
         Timer += Time.deltaTime;
-        if(Timer > 0.5f)
-        {
-            bombman.BombhpHandler.Attack(bombman.BombhpHandler.BombCollider, 30);
-        }
 
         if (Timer > 2f)
         {
