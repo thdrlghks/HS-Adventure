@@ -201,6 +201,11 @@ public class P_Move : MonoBehaviour
         IsInvincible = true;
         animator.SetTrigger("Roll");
 
+        if (controller.isGrounded)
+        {
+            verticalVelocity = -5f; // 바닥에 붙이는 힘
+        }
+
         if (dir.sqrMagnitude < 0.1f)
             dir = transform.forward;
 
@@ -218,7 +223,7 @@ public class P_Move : MonoBehaviour
             if (controller.isGrounded)
             {
                 if (verticalVelocity < 0f)
-                    verticalVelocity = -2f;
+                    verticalVelocity = -10f;
             }
             verticalVelocity += gravity * Time.deltaTime;
 
