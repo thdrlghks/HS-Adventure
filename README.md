@@ -154,7 +154,7 @@
 
 - **Gameplay Video:** [[BoneToBeKing](https://youtu.be/7MW9vx3ee1U)]
 - **Screenshots:**
-![인게임](images/InGameImage.png)
+![인게임](Assets/images/InGameImage.png)
 
 ## 7. Team Credits
 
